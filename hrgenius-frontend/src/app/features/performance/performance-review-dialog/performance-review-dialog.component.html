@@ -1,0 +1,100 @@
+<div class="review-dialog-container">
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>rate_review</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">Submit Performance Review</h2>
+      <p class="dialog-subtitle">
+        Appraise achievements for {{ data.employee?.first_name }} {{ data.employee?.last_name }} ({{ data.performance.review_period }})
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Assigned Goal Context Card -->
+    <div class="goal-context-card">
+      <span class="context-label">Assigned Goal / KPI:</span>
+      <p class="context-text">{{ data.performance.goal }}</p>
+    </div>
+
+    <form [formGroup]="form" class="review-form" (ngSubmit)="onSubmit()">
+      <!-- Interactive 5-Star Rating Selector -->
+      <div class="rating-picker-box">
+        <label class="rating-label">Overall Performance Rating (1 - 5 Stars):</label>
+        <div class="stars-row">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <button
+              type="button"
+              class="star-btn"
+              [class.active]="selectedRating() >= star"
+              (click)="setRating(star)"
+            >
+              <mat-icon>{{ selectedRating() >= star ? 'star' : 'star_border' }}</mat-icon>
+            </button>
+          }
+        </div>
+        <span class="rating-descriptor">{{ ratingLabels[selectedRating()] }}</span>
+      </div>
+
+      <!-- Achievement Summary -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Key Deliverables & Achievements</mat-label>
+        <textarea
+          matInput
+          formControlName="achievement"
+          rows="3"
+          placeholder="Describe how the employee fulfilled or exceeded this objective..."
+          required
+        ></textarea>
+        <mat-icon matPrefix>emoji_events</mat-icon>
+        @if (form.get('achievement')?.hasError('required') && form.get('achievement')?.touched) {
+          <mat-error>Achievement review is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Manager Feedback -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Manager Qualitative Feedback & Mentorship</mat-label>
+        <textarea
+          matInput
+          formControlName="feedback"
+          rows="4"
+          placeholder="Constructive feedback, core strengths, and career development guidance..."
+          required
+        ></textarea>
+        <mat-icon matPrefix>comment</mat-icon>
+        @if (form.get('feedback')?.hasError('required') && form.get('feedback')?.touched) {
+          <mat-error>Manager feedback is required</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSubmitting()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSubmitting()"
+    >
+      @if (isSubmitting()) {
+        <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+      } @else {
+        <mat-icon>verified</mat-icon>
+      }
+      <span>{{ isSubmitting() ? 'Saving Appraisal...' : 'Submit Appraisal' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

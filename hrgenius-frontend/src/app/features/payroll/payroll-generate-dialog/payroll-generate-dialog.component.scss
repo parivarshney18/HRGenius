@@ -1,0 +1,157 @@
+.payroll-dialog-container {
+  padding: 8px 12px 16px;
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+
+    .header-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .dialog-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .dialog-subtitle {
+      font-size: 13px;
+      color: #64748b;
+      margin: 4px 0 0;
+    }
+  }
+
+  .dialog-content {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .alert-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .mode-select-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .mode-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+    }
+
+    .mode-radio-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+  }
+
+  .payroll-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 14px;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .half-width {
+      flex: 1;
+    }
+
+    .third-width {
+      flex: 1;
+    }
+  }
+
+  .calculation-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+    padding: 14px 20px;
+    border-radius: 10px;
+
+    .calc-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .calc-label {
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .calc-val {
+        font-size: 18px;
+        font-weight: 700;
+
+        &.gross { color: #38bdf8; }
+        &.net { color: #4ade80; }
+      }
+    }
+
+    .calc-divider {
+      width: 1px;
+      height: 36px;
+      background: #334155;
+    }
+  }
+
+  .dialog-actions {
+    padding: 16px 16px 0;
+    border-top: 1px solid #f1f5f9;
+  }
+}

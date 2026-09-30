@@ -1,0 +1,84 @@
+<div class="status-dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>assessment</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">Update Candidate Evaluation</h2>
+      <p class="dialog-subtitle">
+        Candidate: <strong>{{ data.candidate.candidate_name }}</strong> ({{ data.candidate.candidate_email }})
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" class="status-form" (ngSubmit)="onSubmit()">
+      <!-- Application Status Dropdown -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Pipeline Stage / Application Status</mat-label>
+        <mat-select formControlName="application_status" required>
+          @for (st of statusOptions; track st) {
+            <mat-option [value]="st">
+              <span class="status-pill-preview" [attr.data-status]="st">{{ st }}</span>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>timeline</mat-icon>
+        @if (form.get('application_status')?.hasError('required') && form.get('application_status')?.touched) {
+          <mat-error>Status is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Interview Date -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Scheduled Interview Date</mat-label>
+        <input matInput type="date" formControlName="interview_date" />
+        <mat-icon matPrefix>calendar_month</mat-icon>
+        <mat-hint>Set date for screening, technical, or final leadership round</mat-hint>
+      </mat-form-field>
+
+      <!-- Interview Result / Remarks -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Interview Feedback &amp; Result Notes</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          formControlName="interview_result"
+          placeholder="e.g. Passed - Strong architectural design; recommended for executive offer."
+        ></textarea>
+        <mat-icon matPrefix>rate_review</mat-icon>
+        <mat-hint>Record evaluation scorecard, strengths, and final decision</mat-hint>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSaving()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSaving()"
+      class="submit-btn"
+    >
+      @if (isSaving()) {
+        <mat-spinner diameter="18" color="accent"></mat-spinner>
+      } @else {
+        <mat-icon>save</mat-icon>
+      }
+      <span>Save Evaluation</span>
+    </button>
+  </mat-dialog-actions>
+</div>

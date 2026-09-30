@@ -1,0 +1,205 @@
+<div class="performance-page-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <div class="title-with-icon">
+        <div class="header-icon-box">
+          <mat-icon>insights</mat-icon>
+        </div>
+        <div>
+          <h1 class="page-title">Performance & Appraisals</h1>
+          <p class="page-subtitle">
+            Quarterly objectives, KPI milestone tracking, and 360 performance reviews.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button (click)="refreshPerformance()" [disabled]="isLoading()" class="refresh-btn">
+        <mat-icon [class.spin]="isLoading()">sync</mat-icon>
+        <span>Refresh</span>
+      </button>
+
+      @if (canManageTeam()) {
+        <button mat-flat-button color="primary" (click)="onOpenGoalDialog()" class="action-btn">
+          <mat-icon>add_task</mat-icon>
+          <span>Assign New Goal</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Metric Badges Overview -->
+  <section class="metrics-grid">
+    <div class="metric-card total">
+      <div class="metric-icon-box">
+        <mat-icon>track_changes</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Total Objectives</span>
+        <span class="metric-number">{{ metrics().total }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card completed">
+      <div class="metric-icon-box">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Appraisals Completed</span>
+        <span class="metric-number">{{ metrics().completed }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card progress">
+      <div class="metric-icon-box">
+        <mat-icon>pending</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">In Progress / Pending</span>
+        <span class="metric-number">{{ metrics().inProgress }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card rating">
+      <div class="metric-icon-box">
+        <mat-icon>star</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Avg Rating</span>
+        <span class="metric-number">{{ metrics().avgRating }} <small>/ 5.0</small></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Tabs Section -->
+  <main class="content-tabs-container">
+    <mat-tab-group
+      animationDuration="250ms"
+      class="performance-tab-group"
+      [selectedIndex]="canManageAll() ? 0 : (isManager() ? 0 : 0)"
+    >
+      <!-- TAB 1: All Company Reviews (HR / Admin) -->
+      @if (canManageAll()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">domain</mat-icon>
+            <span>Company Appraisals ({{ filteredAllReviews().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <!-- Filter Bar -->
+            <div class="filters-card">
+              <div class="filters-row">
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Period</mat-label>
+                  <mat-select [ngModel]="selectedPeriod()" (ngModelChange)="selectedPeriod.set($event)">
+                    <mat-option value="all">All Periods</mat-option>
+                    <mat-option value="Q3 2026">Q3 2026</mat-option>
+                    <mat-option value="Q4 2026">Q4 2026</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>event_repeat</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Rating</mat-label>
+                  <mat-select [ngModel]="selectedRating()" (ngModelChange)="selectedRating.set($event)">
+                    <mat-option value="all">All Ratings</mat-option>
+                    <mat-option value="5">★★★★★ (5 Stars)</mat-option>
+                    <mat-option value="4">★★★★☆ (4 Stars)</mat-option>
+                    <mat-option value="3">★★★☆☆ (3 Stars)</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>star</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Employee</mat-label>
+                  <mat-select [ngModel]="selectedEmployeeId()" (ngModelChange)="selectedEmployeeId.set($event)">
+                    <mat-option value="all">All Employees</mat-option>
+                    @for (emp of employees(); track emp.employee_id) {
+                      <mat-option [value]="emp.employee_id">
+                        {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>badge</mat-icon>
+                </mat-form-field>
+
+                <button mat-stroked-button class="reset-filters-btn" (click)="resetFilters()">
+                  <mat-icon>refresh</mat-icon>
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <app-data-table
+                [data]="filteredAllReviews()"
+                [columns]="allColumns"
+                title="Consolidated Performance Registry"
+                searchPlaceholder="Search goals, feedback, or employees..."
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 2: Manager Team Appraisals -->
+      @if (canManageTeam()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">groups</mat-icon>
+            <span>Team Reviews & Goals ({{ teamReviews().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <div class="section-notice">
+              <mat-icon>supervised_user_circle</mat-icon>
+              <span>
+                Evaluate direct report achievements, grade performance, and provide structured mentorship.
+              </span>
+            </div>
+
+            <div class="table-container">
+              <app-data-table
+                [data]="teamReviews()"
+                [columns]="teamColumns"
+                [actions]="managerActions"
+                title="Direct Reports Evaluation Queue"
+                searchPlaceholder="Search team member goals..."
+                (actionClick)="onTableAction($event)"
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 3: My Goals & Reviews (All Roles) -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-label-icon">emoji_events</mat-icon>
+          <span>My Evaluations ({{ myReviews().length }})</span>
+        </ng-template>
+
+        <div class="tab-content-area">
+          <div class="section-notice">
+            <mat-icon>military_tech</mat-icon>
+            <span>
+              Your personal professional development objectives, completed milestones, and supervisor appraisals.
+            </span>
+          </div>
+
+          <div class="table-container">
+            <app-data-table
+              [data]="myReviews()"
+              [columns]="myColumns"
+              title="Personal Appraisal History"
+              searchPlaceholder="Search goals, reviews, or periods..."
+            ></app-data-table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </main>
+</div>

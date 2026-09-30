@@ -1,0 +1,122 @@
+<div class="payroll-dialog-container">
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>monetization_on</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">Generate Monthly Payroll</h2>
+      <p class="dialog-subtitle">
+        Run monthly payroll calculations, statutory taxes, and compensation disbursements.
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" class="payroll-form" (ngSubmit)="onSubmit()">
+      <!-- Execution Mode Radio -->
+      <div class="mode-select-box">
+        <label class="mode-label">Generation Scope:</label>
+        <mat-radio-group formControlName="mode" class="mode-radio-group">
+          <mat-radio-button value="all">All Active Staff (Bulk Generation)</mat-radio-button>
+          <mat-radio-button value="single">Single Employee Custom Run</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <!-- Payroll Month -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Payroll Month (YYYY-MM)</mat-label>
+        <input matInput type="month" formControlName="payroll_month" required />
+        <mat-icon matPrefix>calendar_month</mat-icon>
+      </mat-form-field>
+
+      <!-- Single Employee Selection & Overrides -->
+      @if (form.get('mode')?.value === 'single') {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Employee</mat-label>
+          <mat-select formControlName="employee_id" required>
+            @for (emp of employees(); track emp.employee_id) {
+              <mat-option [value]="emp.employee_id">
+                {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }} - {{ emp.designation }})
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>badge</mat-icon>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="third-width">
+            <mat-label>Basic Base ($)</mat-label>
+            <input matInput type="number" formControlName="basic_salary" />
+            <mat-icon matPrefix>attach_money</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="third-width">
+            <mat-label>Allowances ($)</mat-label>
+            <input matInput type="number" formControlName="allowances" />
+            <mat-icon matPrefix>add_box</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="third-width">
+            <mat-label>Bonus ($)</mat-label>
+            <input matInput type="number" formControlName="bonus" />
+            <mat-icon matPrefix>card_giftcard</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Statutory Deductions ($)</mat-label>
+            <input matInput type="number" formControlName="deductions" />
+            <mat-icon matPrefix>indeterminate_check_box</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Income Tax ($)</mat-label>
+            <input matInput type="number" formControlName="tax" />
+            <mat-icon matPrefix>receipt</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Live Gross and Net Calculation Summary -->
+        <div class="calculation-summary-card">
+          <div class="calc-col">
+            <span class="calc-label">Calculated Gross:</span>
+            <span class="calc-val gross">{{ liveGross() | currency:'USD' }}</span>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-col">
+            <span class="calc-label">Calculated Net:</span>
+            <span class="calc-val net">{{ liveNet() | currency:'USD' }}</span>
+          </div>
+        </div>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSubmitting()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSubmitting()"
+    >
+      @if (isSubmitting()) {
+        <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+      } @else {
+        <mat-icon>play_circle</mat-icon>
+      }
+      <span>{{ isSubmitting() ? 'Calculating & Generating...' : 'Execute Payroll' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,90 @@
+<div class="goal-dialog-container">
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>flag</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">Assign Team Performance Goal</h2>
+      <p class="dialog-subtitle">
+        Define targeted deliverables and quarterly KPI expectations for a team member.
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" class="goal-form" (ngSubmit)="onSubmit()">
+      <!-- Select Team Member -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Team Member</mat-label>
+        <mat-select formControlName="employee_id" required>
+          @for (emp of data.teamMembers; track emp.employee_id) {
+            <mat-option [value]="emp.employee_id">
+              {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }} - {{ emp.designation }})
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>badge</mat-icon>
+        @if (form.get('employee_id')?.hasError('required') && form.get('employee_id')?.touched) {
+          <mat-error>Please select a team member</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Review Period -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Evaluation Period</mat-label>
+        <mat-select formControlName="review_period" required>
+          @for (period of periods; track period) {
+            <mat-option [value]="period">{{ period }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>event_repeat</mat-icon>
+      </mat-form-field>
+
+      <!-- Goal Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Target Goal & Objective Description</mat-label>
+        <textarea
+          matInput
+          formControlName="goal"
+          rows="4"
+          placeholder="e.g. Lead migration of authentication architecture to modern JWT and reduce frontend bundle size..."
+          required
+        ></textarea>
+        <mat-icon matPrefix>track_changes</mat-icon>
+        @if (form.get('goal')?.hasError('required') && form.get('goal')?.touched) {
+          <mat-error>Goal description is required</mat-error>
+        }
+        @if (form.get('goal')?.hasError('minlength') && form.get('goal')?.touched) {
+          <mat-error>Goal must be at least 10 characters</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSubmitting()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSubmitting()"
+    >
+      @if (isSubmitting()) {
+        <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+      } @else {
+        <mat-icon>add_task</mat-icon>
+      }
+      <span>{{ isSubmitting() ? 'Assigning...' : 'Assign Goal' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

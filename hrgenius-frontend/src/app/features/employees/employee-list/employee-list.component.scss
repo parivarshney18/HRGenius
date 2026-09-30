@@ -1,0 +1,243 @@
+.employees-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+
+  .crumb-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .crumb-arrow {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+  }
+
+  .crumb-current {
+    font-weight: 600;
+    color: #0f172a;
+  }
+}
+
+.page-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    .header-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .header-titles {
+      .page-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      .page-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0.25rem 0 0;
+      }
+    }
+  }
+
+  .header-right {
+    .create-btn {
+      height: 42px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+    }
+  }
+}
+
+.stats-overview {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .stat-pill {
+    flex: 1;
+    min-width: 200px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .stat-icon-wrapper {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      &.total {
+        background-color: #e0f2fe;
+        color: #0284c7;
+      }
+
+      &.active {
+        background-color: #dcfce7;
+        color: #15803d;
+      }
+
+      &.fulltime {
+        background-color: #ede9fe;
+        color: #7c3aed;
+      }
+    }
+
+    .stat-meta {
+      display: flex;
+      flex-direction: column;
+
+      .stat-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.1;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.filter-controls-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+
+  .filter-label-box {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #475569;
+
+    .filter-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #0284c7;
+    }
+
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+
+  .dept-select-field {
+    min-width: 260px;
+  }
+
+  .reset-filter-btn {
+    border-radius: 8px;
+    height: 38px;
+    font-size: 0.85rem;
+    color: #64748b;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.table-card {
+  border-radius: 12px;
+}

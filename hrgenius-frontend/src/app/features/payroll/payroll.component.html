@@ -1,0 +1,189 @@
+<div class="payroll-page-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <div class="title-with-icon">
+        <div class="header-icon-box">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div>
+          <h1 class="page-title">Payroll Management & Compensation</h1>
+          <p class="page-subtitle">
+            Generate monthly payrolls, manage statutory tax withholdings, and disburse employee payslips.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button (click)="refreshPayrolls()" [disabled]="isLoading()" class="refresh-btn">
+        <mat-icon [class.spin]="isLoading()">sync</mat-icon>
+        <span>Refresh</span>
+      </button>
+
+      @if (canManageAll()) {
+        <button mat-flat-button color="primary" (click)="onOpenGenerateDialog()" class="action-btn">
+          <mat-icon>calculate</mat-icon>
+          <span>Run Monthly Payroll</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Metric Badges Overview -->
+  <section class="metrics-grid">
+    <div class="metric-card gross">
+      <div class="metric-icon-box">
+        <mat-icon>account_balance_wallet</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Total Gross Outlay</span>
+        <span class="metric-number">${{ metrics().totalGross | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card net">
+      <div class="metric-icon-box">
+        <mat-icon>payments</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Total Net Disbursed</span>
+        <span class="metric-number">${{ metrics().totalNet | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card tax">
+      <div class="metric-icon-box">
+        <mat-icon>receipt</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Taxes Withheld</span>
+        <span class="metric-number">${{ metrics().totalTax | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card paid">
+      <div class="metric-icon-box">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Paid / Settled</span>
+        <span class="metric-number">{{ metrics().paidCount }} / {{ metrics().totalCount }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Tabs Section -->
+  <main class="content-tabs-container">
+    <mat-tab-group
+      animationDuration="250ms"
+      class="payroll-tab-group"
+      [selectedIndex]="canManageAll() ? 0 : 0"
+    >
+      <!-- TAB 1: Company Payroll Master (HR / Admin) -->
+      @if (canManageAll()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">domain</mat-icon>
+            <span>All Payroll Registers ({{ filteredAllPayrolls().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <!-- Filter Bar -->
+            <div class="filters-card">
+              <div class="filters-row">
+                <!-- Month Filter -->
+                <mat-form-field appearance="outline" class="filter-field month-field" subscriptSizing="dynamic">
+                  <mat-label>Payroll Month</mat-label>
+                  <input
+                    matInput
+                    type="month"
+                    [ngModel]="selectedMonth()"
+                    (ngModelChange)="selectedMonth.set($event)"
+                  />
+                  <mat-icon matPrefix>calendar_month</mat-icon>
+                  @if (selectedMonth()) {
+                    <button mat-icon-button matSuffix (click)="clearMonthFilter()" matTooltip="All Months">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  }
+                </mat-form-field>
+
+                <!-- Status Filter -->
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Status</mat-label>
+                  <mat-select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+                    <mat-option value="all">All Statuses</mat-option>
+                    <mat-option value="Draft">Draft</mat-option>
+                    <mat-option value="Processed">Processed</mat-option>
+                    <mat-option value="Paid">Paid</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>flag</mat-icon>
+                </mat-form-field>
+
+                <!-- Employee Filter -->
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Employee</mat-label>
+                  <mat-select [ngModel]="selectedEmployeeId()" (ngModelChange)="selectedEmployeeId.set($event)">
+                    <mat-option value="all">All Employees</mat-option>
+                    @for (emp of employees(); track emp.employee_id) {
+                      <mat-option [value]="emp.employee_id">
+                        {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>badge</mat-icon>
+                </mat-form-field>
+
+                <button mat-stroked-button class="reset-filters-btn" (click)="resetFilters()">
+                  <mat-icon>refresh</mat-icon>
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- All Payroll Table -->
+            <div class="table-container">
+              <app-data-table
+                [data]="filteredAllPayrolls()"
+                [columns]="allColumns"
+                [actions]="hrActions"
+                title="Consolidated Monthly Payroll Run"
+                searchPlaceholder="Search employee, designation, month, status..."
+                (actionClick)="onTableAction($event)"
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 2: My Payslips (All Roles) -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-label-icon">receipt_long</mat-icon>
+          <span>My Payslips ({{ myPayrolls().length }})</span>
+        </ng-template>
+
+        <div class="tab-content-area">
+          <div class="section-notice">
+            <mat-icon>verified_user</mat-icon>
+            <span>
+              Official salary compensation statements and statutory deductions. Click "View Statement" to print or download as PDF.
+            </span>
+          </div>
+
+          <div class="table-container">
+            <app-data-table
+              [data]="myPayrolls()"
+              [columns]="myColumns"
+              [actions]="myActions"
+              title="Personal Earnings & Withholdings Statements"
+              searchPlaceholder="Search pay periods or statuses..."
+              (actionClick)="onTableAction($event)"
+            ></app-data-table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </main>
+</div>

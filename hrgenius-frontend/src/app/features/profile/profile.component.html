@@ -1,0 +1,420 @@
+<div class="profile-container">
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-box">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading employee profile details...</span>
+    </div>
+  } @else if (selectedEmployee(); as emp) {
+    <!-- Breadcrumb / Header Toolbar -->
+    <div class="top-toolbar">
+      <div class="toolbar-left">
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">Personal credentials, corporate assignment, and compensation history</p>
+      </div>
+
+      <div class="toolbar-right">
+        <!-- Employee Selector for HR / ADMIN only -->
+        @if (canSelectEmployee()) {
+          <mat-form-field appearance="outline" class="employee-picker-field" subscriptSizing="dynamic">
+            <mat-label>View Profile As</mat-label>
+            <mat-select [(ngModel)]="selectedEmployeeId" (selectionChange)="onEmployeeChange($event.value)">
+              @for (e of allEmployees(); track e.employee_id) {
+                <mat-option [value]="e.employee_id">
+                  {{ e.first_name }} {{ e.last_name }} ({{ e.employee_code }})
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <button mat-stroked-button class="action-btn print-btn" (click)="onPrint()" matTooltip="Print or save as PDF">
+          <mat-icon>print</mat-icon>
+          Print Profile
+        </button>
+
+        <button mat-flat-button color="primary" class="action-btn payslip-nav-btn" (click)="goToPayslips()">
+          <mat-icon>receipt_long</mat-icon>
+          All Payslips
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero Card Banner -->
+    <div class="profile-hero-card">
+      <div class="hero-left">
+        <div class="avatar-box">
+          {{ emp.first_name.charAt(0) }}{{ emp.last_name.charAt(0) }}
+        </div>
+        <div class="hero-meta">
+          <div class="title-row">
+            <h2 class="employee-name">{{ emp.first_name }} {{ emp.last_name }}</h2>
+            <span class="status-badge" [attr.data-status]="emp.status">
+              {{ emp.status }}
+            </span>
+            @if (canSelectEmployee() && selectedEmployeeId !== currentUser()?.id) {
+              <span class="role-badge">Selected Staff</span>
+            } @else {
+              <span class="role-badge">{{ userRole() }}</span>
+            }
+          </div>
+
+          <div class="designation-text">{{ emp.designation }}</div>
+
+          <div class="tags-row">
+            <span class="meta-tag code-tag">
+              <mat-icon>badge</mat-icon>
+              {{ emp.employee_code }}
+            </span>
+            <span class="meta-tag dept-tag">
+              <mat-icon>domain</mat-icon>
+              {{ department()?.department_name || 'Operations' }}
+            </span>
+            <span class="meta-tag type-tag">
+              <mat-icon>work_outline</mat-icon>
+              {{ emp.employment_type }}
+            </span>
+            <span class="meta-tag email-tag">
+              <mat-icon>alternate_email</mat-icon>
+              {{ emp.email }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="quick-stat-box">
+          <div class="stat-label">Date of Joining</div>
+          <div class="stat-value">{{ emp.date_of_joining | date:'mediumDate' }}</div>
+          <div class="stat-sub">Active Corporate Member</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Compensation KPI Highlight Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card gross-card">
+        <div class="kpi-icon-wrapper gross-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-title">Current Gross Pay</span>
+          <span class="kpi-number">{{ compensationSummary().latestGross | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="kpi-footnote">Basic + Allowances + Bonus</span>
+        </div>
+      </div>
+
+      <div class="kpi-card net-card">
+        <div class="kpi-icon-wrapper net-icon">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-title">Latest Net Disbursed</span>
+          <span class="kpi-number highlight-net">{{ compensationSummary().latestNet | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="kpi-footnote">Month: {{ compensationSummary().latestMonth }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card total-card">
+        <div class="kpi-icon-wrapper total-icon">
+          <mat-icon>monetization_on</mat-icon>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-title">Total Disbursed (Paid)</span>
+          <span class="kpi-number">{{ compensationSummary().totalPaid | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="kpi-footnote">Across {{ compensationSummary().recordCount }} payroll cycle(s)</span>
+        </div>
+      </div>
+
+      <div class="kpi-card timeoff-card">
+        <div class="kpi-icon-wrapper timeoff-icon">
+          <mat-icon>event_available</mat-icon>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-title">Quick Navigation</span>
+          <div class="quick-links">
+            <a (click)="goToLeaves()" class="quick-link">
+              <mat-icon>flight_takeoff</mat-icon> Leave Portal
+            </a>
+            <a (click)="goToPayslips()" class="quick-link">
+              <mat-icon>receipt</mat-icon> Payslip Hub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Grid: Personal & Employment Details -->
+    <div class="details-grid">
+      <!-- Card 1: Personal Details -->
+      <mat-card class="detail-card">
+        <div class="card-header">
+          <div class="header-icon-box personal-box">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div>
+            <h3 class="card-title">Personal Details</h3>
+            <span class="card-subtitle">Identity and personal contact information</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">Full Name</span>
+            <span class="info-value font-semibold">{{ emp.first_name }} {{ emp.last_name }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Gender</span>
+            <span class="info-value">
+              <mat-icon class="inline-icon">
+                {{ emp.gender === 'Female' ? 'female' : 'male' }}
+              </mat-icon>
+              {{ emp.gender }}
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value">
+              <mat-icon class="inline-icon">cake</mat-icon>
+              {{ emp.date_of_birth | date:'longDate' }}
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">
+              <a [href]="'mailto:' + emp.email" class="contact-link">
+                <mat-icon class="inline-icon">email</mat-icon>
+                {{ emp.email }}
+              </a>
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Phone Number</span>
+            <span class="info-value">
+              <a [href]="'tel:' + emp.phone" class="contact-link">
+                <mat-icon class="inline-icon">call</mat-icon>
+                {{ emp.phone }}
+              </a>
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Residential Address</span>
+            <span class="info-value address-value">
+              <mat-icon class="inline-icon">home</mat-icon>
+              {{ emp.address }}
+            </span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Card 2: Employment Details -->
+      <mat-card class="detail-card">
+        <div class="card-header">
+          <div class="header-icon-box work-box">
+            <mat-icon>business_center</mat-icon>
+          </div>
+          <div>
+            <h3 class="card-title">Employment Details</h3>
+            <span class="card-subtitle">Organizational positioning and status</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">Employee Code</span>
+            <span class="info-value code-pill">{{ emp.employee_code }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Department</span>
+            <span class="info-value highlight-dept">
+              <mat-icon class="inline-icon">domain</mat-icon>
+              {{ department()?.department_name || 'Operations' }}
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Designation / Role</span>
+            <span class="info-value font-semibold">{{ emp.designation }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Reporting Manager</span>
+            <span class="info-value">
+              @if (manager(); as mgr) {
+                <span class="mgr-pill">
+                  <mat-icon class="inline-icon">supervisor_account</mat-icon>
+                  {{ mgr.first_name }} {{ mgr.last_name }} ({{ mgr.designation }})
+                </span>
+              } @else {
+                <span class="text-muted">Executive / Direct to Board</span>
+              }
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Date of Joining</span>
+            <span class="info-value">
+              <mat-icon class="inline-icon">calendar_today</mat-icon>
+              {{ emp.date_of_joining | date:'longDate' }}
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Employment Type</span>
+            <span class="info-value">
+              <span class="type-badge">{{ emp.employment_type }}</span>
+            </span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Current Status</span>
+            <span class="info-value">
+              <span class="status-chip active-chip">
+                <mat-icon class="dot-icon">fiber_manual_record</mat-icon>
+                {{ emp.status }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Section 3: Salary History Table & Compensation Overview -->
+    <mat-card class="salary-history-card">
+      <div class="salary-header">
+        <div class="title-area">
+          <div class="header-icon-box salary-box">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <div>
+            <h3 class="card-title">Salary & Compensation History</h3>
+            <span class="card-subtitle">Monthly payslips, gross compensation, statutory tax deductions, and net payouts</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button mat-stroked-button color="primary" class="payslips-btn" (click)="goToPayslips()">
+            <mat-icon>open_in_new</mat-icon>
+            Detailed Payslip Portal
+          </button>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+
+      @if (salaryHistory().length === 0) {
+        <div class="empty-salary-state">
+          <mat-icon class="empty-icon">payments_off</mat-icon>
+          <h4>No Payroll Records Available</h4>
+          <p>No historical payroll records were found for this employee yet. When payroll is generated by HR, records will appear here.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="salaryHistory()" class="salary-table">
+            <!-- Month Column -->
+            <ng-container matColumnDef="payroll_month">
+              <th mat-header-cell *matHeaderCellDef> Month </th>
+              <td mat-cell *matCellDef="let record">
+                <div class="month-cell">
+                  <mat-icon class="cal-icon">calendar_month</mat-icon>
+                  <span class="month-text">{{ record.payroll_month }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Basic Salary Column -->
+            <ng-container matColumnDef="basic_salary">
+              <th mat-header-cell *matHeaderCellDef> Basic </th>
+              <td mat-cell *matCellDef="let record">
+                {{ record.basic_salary | currency:'USD':'symbol':'1.0-0' }}
+              </td>
+            </ng-container>
+
+            <!-- Allowances Column -->
+            <ng-container matColumnDef="allowances">
+              <th mat-header-cell *matHeaderCellDef> Allowances </th>
+              <td mat-cell *matCellDef="let record">
+                +{{ record.allowances | currency:'USD':'symbol':'1.0-0' }}
+              </td>
+            </ng-container>
+
+            <!-- Bonus Column -->
+            <ng-container matColumnDef="bonus">
+              <th mat-header-cell *matHeaderCellDef> Bonus </th>
+              <td mat-cell *matCellDef="let record">
+                @if (record.bonus > 0) {
+                  <span class="bonus-tag">+{{ record.bonus | currency:'USD':'symbol':'1.0-0' }}</span>
+                } @else {
+                  <span class="text-muted">$0</span>
+                }
+              </td>
+            </ng-container>
+
+            <!-- Gross Column -->
+            <ng-container matColumnDef="gross_salary">
+              <th mat-header-cell *matHeaderCellDef> Gross Pay </th>
+              <td mat-cell *matCellDef="let record">
+                <span class="gross-text">{{ record.gross_salary | currency:'USD':'symbol':'1.0-0' }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Deductions Column -->
+            <ng-container matColumnDef="deductions">
+              <th mat-header-cell *matHeaderCellDef> Deductions & Tax </th>
+              <td mat-cell *matCellDef="let record">
+                <span class="deductions-text">-{{ record.deductions_total | currency:'USD':'symbol':'1.0-0' }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Net Salary Column -->
+            <ng-container matColumnDef="net_salary">
+              <th mat-header-cell *matHeaderCellDef> Net Salary </th>
+              <td mat-cell *matCellDef="let record">
+                <span class="net-text">{{ record.net_salary | currency:'USD':'symbol':'1.0-0' }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="payroll_status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let record">
+                <span class="status-chip" [attr.data-status]="record.payroll_status">
+                  {{ record.payroll_status }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Payment Date Column -->
+            <ng-container matColumnDef="payment_date">
+              <th mat-header-cell *matHeaderCellDef> Payment Date </th>
+              <td mat-cell *matCellDef="let record">
+                {{ record.payment_date ? (record.payment_date | date:'mediumDate') : '—' }}
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="actions-header"> Payslip </th>
+              <td mat-cell *matCellDef="let record" class="actions-cell">
+                <button mat-stroked-button color="primary" class="view-slip-btn" (click)="openPayslip(record)" matTooltip="View or print payslip">
+                  <mat-icon>visibility</mat-icon>
+                  View
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="salaryColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: salaryColumns;" class="salary-row"></tr>
+          </table>
+        </div>
+      }
+    </mat-card>
+  }
+</div>

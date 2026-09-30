@@ -1,0 +1,198 @@
+<div class="employee-detail-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-bar">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <a routerLink="/employees" class="crumb-link">
+      Employees
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <span class="crumb-current">
+      {{ employee() ? employee()!.first_name + ' ' + employee()!.last_name : 'Employee Profile' }}
+    </span>
+  </nav>
+
+  @if (isLoading()) {
+    <div class="loading-box mat-elevation-z1">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading employee profile...</span>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner mat-elevation-z1">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <div class="error-text">
+        <h3>Record Not Accessible</h3>
+        <p>{{ errorMessage() }}</p>
+      </div>
+      <button mat-stroked-button routerLink="/employees">Back to Directory</button>
+    </div>
+  } @else if (employee(); as emp) {
+    <!-- Main Profile Hero Card -->
+    <div class="profile-hero-card mat-elevation-z1">
+      <div class="hero-left">
+        <div class="avatar-box">
+          {{ emp.first_name.charAt(0) }}{{ emp.last_name.charAt(0) }}
+        </div>
+        <div class="hero-meta">
+          <div class="title-row">
+            <h1 class="employee-name">{{ emp.first_name }} {{ emp.last_name }}</h1>
+            <span class="status-badge" [attr.data-status]="emp.status">
+              {{ emp.status }}
+            </span>
+          </div>
+          <p class="designation-text">{{ emp.designation }}</p>
+          <div class="tags-row">
+            <span class="meta-tag code-tag">
+              <mat-icon>tag</mat-icon>
+              {{ emp.employee_code }}
+            </span>
+            <span class="meta-tag type-tag">
+              <mat-icon>work</mat-icon>
+              {{ emp.employment_type }}
+            </span>
+            @if (department(); as dept) {
+              <span class="meta-tag dept-tag">
+                <mat-icon>domain</mat-icon>
+                {{ dept.department_name }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button mat-stroked-button (click)="navigateToEdit()" class="edit-btn">
+          <mat-icon>edit</mat-icon>
+          Edit Profile
+        </button>
+        <button mat-stroked-button color="warn" (click)="confirmDelete()" class="delete-btn">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Information Cards Grid -->
+    <div class="details-grid">
+      <!-- Card 1: Organizational & Employment -->
+      <mat-card class="detail-card mat-elevation-z1">
+        <mat-card-header class="card-header">
+          <mat-icon class="header-icon">apartment</mat-icon>
+          <mat-card-title class="card-title">Employment &amp; Organization</mat-card-title>
+        </mat-card-header>
+        <mat-divider></mat-divider>
+        <mat-card-content class="card-body">
+          <div class="info-item">
+            <span class="info-label">Assigned Department</span>
+            <span class="info-value highlight">
+              {{ department() ? department()!.department_name : 'Department #' + emp.department_id }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Reporting Manager</span>
+            <span class="info-value">
+              @if (manager(); as mgr) {
+                <strong>{{ mgr.first_name }} {{ mgr.last_name }}</strong> &bull; {{ mgr.designation }}
+              } @else {
+                <span class="text-muted">None (Direct Report / C-Level)</span>
+              }
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Employment Type</span>
+            <span class="info-value">{{ emp.employment_type }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Date of Joining</span>
+            <span class="info-value">{{ emp.date_of_joining }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">System Record ID</span>
+            <span class="info-value code-pill">#{{ emp.employee_id }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 2: Contact Information -->
+      <mat-card class="detail-card mat-elevation-z1">
+        <mat-card-header class="card-header">
+          <mat-icon class="header-icon">contact_mail</mat-icon>
+          <mat-card-title class="card-title">Contact Information</mat-card-title>
+        </mat-card-header>
+        <mat-divider></mat-divider>
+        <mat-card-content class="card-body">
+          <div class="info-item">
+            <span class="info-label">Corporate Email</span>
+            <span class="info-value">
+              <a [href]="'mailto:' + emp.email" class="email-link">
+                <mat-icon class="inline-icon">mail</mat-icon>
+                {{ emp.email }}
+              </a>
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Phone Number</span>
+            <span class="info-value">
+              <a [href]="'tel:' + emp.phone" class="phone-link">
+                <mat-icon class="inline-icon">phone</mat-icon>
+                {{ emp.phone }}
+              </a>
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Residential Address</span>
+            <span class="info-value address-text">
+              <mat-icon class="inline-icon">home</mat-icon>
+              {{ emp.address }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 3: Personal Demographics -->
+      <mat-card class="detail-card mat-elevation-z1">
+        <mat-card-header class="card-header">
+          <mat-icon class="header-icon">person_outline</mat-icon>
+          <mat-card-title class="card-title">Personal Demographics</mat-card-title>
+        </mat-card-header>
+        <mat-divider></mat-divider>
+        <mat-card-content class="card-body">
+          <div class="info-item">
+            <span class="info-label">Gender</span>
+            <span class="info-value">{{ emp.gender }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value">
+              <mat-icon class="inline-icon">cake</mat-icon>
+              {{ emp.date_of_birth }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Account State</span>
+            <span class="info-value">{{ emp.status }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Navigation Footer -->
+    <div class="detail-footer">
+      <button mat-stroked-button routerLink="/employees" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Employee Directory
+      </button>
+    </div>
+  }
+</div>

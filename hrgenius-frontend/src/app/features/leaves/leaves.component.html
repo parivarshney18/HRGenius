@@ -1,0 +1,255 @@
+<div class="leaves-page-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <div class="title-with-icon">
+        <div class="header-icon-box">
+          <mat-icon>flight_takeoff</mat-icon>
+        </div>
+        <div>
+          <h1 class="page-title">Leave & Time-Off Management</h1>
+          <p class="page-subtitle">
+            Apply for personal time-off, track leave balances, and review team approval requests.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button (click)="refreshLeaves()" [disabled]="isLoading()" class="refresh-btn">
+        <mat-icon [class.spin]="isLoading()">sync</mat-icon>
+        <span>Refresh</span>
+      </button>
+
+      <button mat-flat-button color="primary" (click)="onOpenApplyDialog()" class="action-btn">
+        <mat-icon>add</mat-icon>
+        <span>Apply for Leave</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Metric Badges Overview -->
+  <section class="metrics-grid">
+    <div class="metric-card total">
+      <div class="metric-icon-box">
+        <mat-icon>date_range</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Total Applications</span>
+        <span class="metric-number">{{ metrics().total }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card pending">
+      <div class="metric-icon-box">
+        <mat-icon>pending_actions</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Pending Approval</span>
+        <span class="metric-number">{{ metrics().pending }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card approved">
+      <div class="metric-icon-box">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Approved</span>
+        <span class="metric-number">{{ metrics().approved }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card rejected">
+      <div class="metric-icon-box">
+        <mat-icon>highlight_off</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Rejected</span>
+        <span class="metric-number">{{ metrics().rejected }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Tabs Section -->
+  <main class="content-tabs-container">
+    <mat-tab-group
+      animationDuration="250ms"
+      class="leaves-tab-group"
+      [selectedIndex]="canApprove() ? 0 : 0"
+    >
+      <!-- TAB 1: Pending Approvals (Manager / HR / Admin) -->
+      @if (canApprove()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">pending_actions</mat-icon>
+            <span>Pending Approvals ({{ pendingApprovals().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <div class="section-notice">
+              <mat-icon>info</mat-icon>
+              <span>
+                {{ isManager() && !canManageAll()
+                  ? 'Pending time-off requests from your direct team reports.'
+                  : 'Organization-wide pending time-off requests awaiting administrative action.' }}
+              </span>
+            </div>
+
+            @if (pendingApprovals().length === 0) {
+              <div class="empty-state">
+                <mat-icon class="empty-icon">task_alt</mat-icon>
+                <h3>All Caught Up!</h3>
+                <p>There are no pending leave requests awaiting approval at this time.</p>
+              </div>
+            } @else {
+              <div class="pending-cards-grid">
+                @for (item of pendingApprovals(); track item.leave_id) {
+                  <mat-card class="approval-card">
+                    <div class="card-header-row">
+                      <div class="applicant-info">
+                        <div class="applicant-avatar">
+                          <mat-icon>person</mat-icon>
+                        </div>
+                        <div>
+                          <h4 class="applicant-name">{{ item.employee_name }}</h4>
+                          <span class="applicant-meta">{{ item.employee_code }} • {{ item.designation }} • {{ item.department_name }}</span>
+                        </div>
+                      </div>
+                      <span class="status-chip pending-chip">PENDING</span>
+                    </div>
+
+                    <div class="card-body-details">
+                      <div class="detail-row">
+                        <span class="detail-label">Leave Type:</span>
+                        <strong class="detail-val">{{ item.leave_type }}</strong>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Duration:</span>
+                        <strong class="detail-val">{{ item.start_date }} to {{ item.end_date }} ({{ item.number_of_days }} Days)</strong>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Applied On:</span>
+                        <span class="detail-val">{{ item.applied_date }}</span>
+                      </div>
+                      <div class="reason-box">
+                        <span class="reason-label">Reason:</span>
+                        <p class="reason-text">"{{ item.reason }}"</p>
+                      </div>
+                    </div>
+
+                    <div class="card-actions-row">
+                      <button mat-stroked-button color="warn" class="action-btn reject-btn" (click)="onReject(item)">
+                        <mat-icon>close</mat-icon>
+                        <span>Reject</span>
+                      </button>
+                      <button mat-flat-button color="primary" class="action-btn approve-btn" (click)="onApprove(item)">
+                        <mat-icon>check</mat-icon>
+                        <span>Approve</span>
+                      </button>
+                    </div>
+                  </mat-card>
+                }
+              </div>
+            }
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 2: All Company Requests (HR / Admin) -->
+      @if (canManageAll()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">domain</mat-icon>
+            <span>All Requests ({{ filteredAllLeaves().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <!-- Filter Bar -->
+            <div class="filters-card">
+              <div class="filters-row">
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Status</mat-label>
+                  <mat-select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+                    <mat-option value="all">All Statuses</mat-option>
+                    <mat-option value="PENDING">PENDING</mat-option>
+                    <mat-option value="APPROVED">APPROVED</mat-option>
+                    <mat-option value="REJECTED">REJECTED</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>flag</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Leave Type</mat-label>
+                  <mat-select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
+                    <mat-option value="all">All Types</mat-option>
+                    <mat-option value="Annual Leave">Annual Leave</mat-option>
+                    <mat-option value="Sick Leave">Sick Leave</mat-option>
+                    <mat-option value="Casual Leave">Casual Leave</mat-option>
+                    <mat-option value="Maternity Leave">Maternity Leave</mat-option>
+                    <mat-option value="Unpaid Leave">Unpaid Leave</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>category</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Employee</mat-label>
+                  <mat-select [ngModel]="selectedEmployeeId()" (ngModelChange)="selectedEmployeeId.set($event)">
+                    <mat-option value="all">All Employees</mat-option>
+                    @for (emp of employees(); track emp.employee_id) {
+                      <mat-option [value]="emp.employee_id">
+                        {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>badge</mat-icon>
+                </mat-form-field>
+
+                <button mat-stroked-button class="reset-filters-btn" (click)="resetFilters()">
+                  <mat-icon>refresh</mat-icon>
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- All Leaves Table -->
+            <div class="table-container">
+              <app-data-table
+                [data]="filteredAllLeaves()"
+                [columns]="allColumns"
+                title="Company-Wide Leave Register"
+                searchPlaceholder="Search by employee, leave type, reason..."
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 3: My Leave History (All Users) -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-label-icon">history</mat-icon>
+          <span>My Leave History ({{ myLeaves().length }})</span>
+        </ng-template>
+
+        <div class="tab-content-area">
+          <div class="section-notice">
+            <mat-icon>person</mat-icon>
+            <span>
+              Your personal leave applications, approved dates, and processing status.
+            </span>
+          </div>
+
+          <div class="table-container">
+            <app-data-table
+              [data]="myLeaves()"
+              [columns]="myColumns"
+              title="Personal Leave Ledger"
+              searchPlaceholder="Search past leaves, dates, or reasons..."
+            ></app-data-table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </main>
+</div>

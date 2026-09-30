@@ -1,0 +1,135 @@
+<div class="job-dialog-container">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>{{ isEditMode ? 'edit_note' : 'post_add' }}</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">
+        {{ isEditMode ? 'Edit Job Opening' : 'Post New Job Opening' }}
+      </h2>
+      <p class="dialog-subtitle">
+        {{ isEditMode ? 'Modify job description, openings, and application deadlines.' : 'Publish a new corporate career requisition.' }}
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" class="job-form" (ngSubmit)="onSubmit()">
+      <!-- Job Title -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="job_title" placeholder="e.g. Senior Frontend Engineer (Angular)" required />
+        <mat-icon matPrefix>work</mat-icon>
+        @if (form.get('job_title')?.hasError('required') && form.get('job_title')?.touched) {
+          <mat-error>Job title is required</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-row">
+        <!-- Department Dropdown -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Department</mat-label>
+          <mat-select formControlName="department_id" required>
+            @for (dept of departments(); track dept.department_id) {
+              <mat-option [value]="dept.department_id">
+                {{ dept.department_name }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>domain</mat-icon>
+          @if (form.get('department_id')?.hasError('required') && form.get('department_id')?.touched) {
+            <mat-error>Please select a department</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Openings -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Headcount Openings</mat-label>
+          <input matInput type="number" formControlName="openings" min="1" required />
+          <mat-icon matPrefix>group_add</mat-icon>
+          @if (form.get('openings')?.hasError('required') && form.get('openings')?.touched) {
+            <mat-error>Openings count is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <!-- Posting Date -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Posting Date</mat-label>
+          <input matInput type="date" formControlName="posting_date" required />
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <!-- Closing Date -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Application Deadline</mat-label>
+          <input matInput type="date" formControlName="closing_date" required />
+          <mat-icon matPrefix>event_busy</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Role Description &amp; Responsibilities</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          formControlName="description"
+          placeholder="Summary of core responsibilities, team impact, and objectives..."
+          required
+        ></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+          <mat-error>Description is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Requirements -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Key Requirements &amp; Qualifications</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          formControlName="requirements"
+          placeholder="Required years of experience, core technical skills, and credentials..."
+          required
+        ></textarea>
+        <mat-icon matPrefix>fact_check</mat-icon>
+        @if (form.get('requirements')?.hasError('required') && form.get('requirements')?.touched) {
+          <mat-error>Requirements are required</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSaving()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSaving()"
+      class="submit-btn"
+    >
+      @if (isSaving()) {
+        <mat-spinner diameter="18" color="accent"></mat-spinner>
+      } @else {
+        <mat-icon>{{ isEditMode ? 'save' : 'publish' }}</mat-icon>
+      }
+      <span>{{ isEditMode ? 'Save Changes' : 'Publish Job' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

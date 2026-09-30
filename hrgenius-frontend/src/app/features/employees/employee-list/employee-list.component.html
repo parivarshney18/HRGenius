@@ -1,0 +1,127 @@
+<div class="employees-page-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-bar">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <span class="crumb-current">Employees Directory</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header-card mat-elevation-z1">
+    <div class="header-left">
+      <div class="header-icon-box">
+        <mat-icon>badge</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1 class="page-title">Employees Directory</h1>
+        <p class="page-subtitle">
+          Manage personnel profiles, departmental hierarchy, contact information, and employment status.
+        </p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="navigateToAdd()"
+        class="create-btn"
+      >
+        <mat-icon>person_add</mat-icon>
+        <span>Add Employee</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Stats Bar -->
+  <div class="stats-overview">
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper total">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ employees().length }}</span>
+        <span class="stat-label">Total Staff</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper active">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ activeCount() }}</span>
+        <span class="stat-label">Active Employees</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper fulltime">
+        <mat-icon>work</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ fullTimeCount() }}</span>
+        <span class="stat-label">Full-Time</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Action Controls -->
+  <div class="filter-controls-card mat-elevation-z1">
+    <div class="filter-label-box">
+      <mat-icon class="filter-icon">filter_alt</mat-icon>
+      <span class="filter-label">Filter By Department:</span>
+    </div>
+
+    <mat-form-field appearance="outline" class="dept-select-field" subscriptSizing="dynamic">
+      <mat-label>Select Department</mat-label>
+      <mat-select
+        [ngModel]="selectedDepartmentId()"
+        (ngModelChange)="onDepartmentFilterChange($event)"
+      >
+        <mat-option value="ALL">All Departments ({{ employees().length }})</mat-option>
+        @for (dept of departments(); track dept.department_id) {
+          <mat-option [value]="dept.department_id.toString()">
+            {{ dept.department_name }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (selectedDepartmentId() !== 'ALL') {
+      <button
+        mat-stroked-button
+        class="reset-filter-btn"
+        (click)="onDepartmentFilterChange('ALL')"
+      >
+        <mat-icon>clear</mat-icon>
+        Reset Filter
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading employee records...</span>
+    </div>
+  }
+
+  <!-- Data Table using Shared Component -->
+  <div class="table-card">
+    <app-data-table
+      [data]="filteredEmployees()"
+      [columns]="columns"
+      [actions]="actions"
+      title="Corporate Personnel Roster"
+      searchPlaceholder="Search by name, code, or designation..."
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25]"
+      (actionClick)="handleActionClick($event)"
+    ></app-data-table>
+  </div>
+</div>

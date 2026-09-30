@@ -1,0 +1,332 @@
+<div class="dashboard-container">
+  <!-- Welcome Banner -->
+  <header class="welcome-banner">
+    <div class="banner-content">
+      <div class="greeting-row">
+        <h1 class="welcome-title">Welcome back, {{ currentUser()?.name }}</h1>
+        <app-role-badge [role]="currentUser()?.role || 'EMPLOYEE'"></app-role-badge>
+      </div>
+      <p class="welcome-subtitle">
+        {{ currentUser()?.title }} • {{ currentUser()?.department }} •
+        <span class="live-date">{{ '' | date:'fullDate' }}</span>
+      </p>
+    </div>
+
+    <div class="banner-actions">
+      <button mat-stroked-button (click)="loadAllData()" [disabled]="isLoading()" class="refresh-btn">
+        <mat-icon [class.spin]="isLoading()">sync</mat-icon>
+        <span>Refresh Data</span>
+      </button>
+
+      <a mat-flat-button color="primary" routerLink="/attendance" class="quick-nav-btn">
+        <mat-icon>schedule</mat-icon>
+        <span>Clock In / Out</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- 4 Mandatory High-Impact KPI Cards -->
+  <section class="kpi-cards-grid">
+    <!-- Card 1: Total Employees -->
+    <mat-card class="kpi-card total-emp">
+      <div class="kpi-icon-box">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Total Employees</span>
+        <h2 class="kpi-value">{{ totalEmployeesCount() }}</h2>
+        <span class="kpi-trend positive">
+          <mat-icon>trending_up</mat-icon> Active workforce
+        </span>
+      </div>
+    </mat-card>
+
+    <!-- Card 2: New Hires -->
+    <mat-card class="kpi-card new-hires">
+      <div class="kpi-icon-box">
+        <mat-icon>person_add</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">New Hires</span>
+        <h2 class="kpi-value">{{ newHiresCount() }}</h2>
+        <span class="kpi-trend info">
+          <mat-icon>how_to_reg</mat-icon> Onboarded recently
+        </span>
+      </div>
+    </mat-card>
+
+    <!-- Card 3: Open Positions -->
+    <mat-card class="kpi-card open-jobs">
+      <div class="kpi-icon-box">
+        <mat-icon>work</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Open Positions</span>
+        <h2 class="kpi-value">{{ openPositionsCount() }}</h2>
+        <span class="kpi-trend accent">
+          <mat-icon>campaign</mat-icon> Across all depts
+        </span>
+      </div>
+    </mat-card>
+
+    <!-- Card 4: Pending Leaves -->
+    <mat-card class="kpi-card pending-leaves">
+      <div class="kpi-icon-box">
+        <mat-icon>event_busy</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Pending Leaves</span>
+        <h2 class="kpi-value">{{ pendingLeavesCount() }}</h2>
+        <span class="kpi-trend warning">
+          <mat-icon>hourglass_top</mat-icon> Awaiting review
+        </span>
+      </div>
+    </mat-card>
+  </section>
+
+  <!-- Role-Tailored Highlights Section -->
+  @if (isEmployee()) {
+    <section class="role-highlights-section">
+      <div class="section-title-row">
+        <mat-icon>badge</mat-icon>
+        <h3>Employee Self-Service Quick Glance</h3>
+      </div>
+      <div class="highlights-grid">
+        <div class="highlight-tile">
+          <span class="tile-title">Today's Shift Punch</span>
+          <div class="tile-content">
+            @if (myAttendanceToday()) {
+              <span class="punch-active">
+                Checked in at {{ myAttendanceToday()?.check_in }}
+                ({{ myAttendanceToday()?.attendance_status }})
+              </span>
+            } @else {
+              <span class="punch-inactive">Not clocked in yet today</span>
+            }
+          </div>
+          <a routerLink="/attendance" class="tile-link">Open Punch Card →</a>
+        </div>
+
+        <div class="highlight-tile">
+          <span class="tile-title">Leave Status</span>
+          <div class="tile-content">
+            <strong>{{ myPendingLeaves() }}</strong> requests awaiting supervisor approval
+          </div>
+          <a routerLink="/leaves" class="tile-link">Manage Time Off →</a>
+        </div>
+
+        <div class="highlight-tile">
+          <span class="tile-title">Compensation & Payslips</span>
+          <div class="tile-content">
+            Latest statement ready for review & printing
+          </div>
+          <a routerLink="/payroll" class="tile-link">View Payslips →</a>
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (isManager()) {
+    <section class="role-highlights-section">
+      <div class="section-title-row">
+        <mat-icon>supervisor_account</mat-icon>
+        <h3>Manager Team Oversight Hub</h3>
+      </div>
+      <div class="highlights-grid">
+        <div class="highlight-tile">
+          <span class="tile-title">Direct Reports</span>
+          <div class="tile-content">
+            <strong>{{ teamMembersCount() }} Staff Members</strong> in your reporting line
+          </div>
+          <a routerLink="/attendance" class="tile-link">Inspect Team Shifts →</a>
+        </div>
+
+        <div class="highlight-tile">
+          <span class="tile-title">Team Approvals</span>
+          <div class="tile-content">
+            Direct reports with active time-off or appraisal items
+          </div>
+          <a routerLink="/leaves" class="tile-link">Process Approvals →</a>
+        </div>
+
+        <div class="highlight-tile">
+          <span class="tile-title">Performance Reviews</span>
+          <div class="tile-content">
+            Quarterly appraisals & 5-star grading queue
+          </div>
+          <a routerLink="/performance" class="tile-link">Evaluate Team →</a>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- 6 Visual Analytics Charts Grid -->
+  <section class="charts-section">
+    <div class="section-title-row">
+      <mat-icon>analytics</mat-icon>
+      <h3>Organizational Metrics & Visual Intelligence</h3>
+    </div>
+
+    <div class="charts-grid">
+      <!-- Chart 1: Department Headcount -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>pie_chart</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Department-Wise Headcount</h4>
+            <span>Staff distribution across business units</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="deptChartData()"
+            [options]="deptChartOptions"
+            [type]="'doughnut'">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Chart 2: Attendance Summary -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>donut_large</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Attendance Summary</h4>
+            <span>Today's presence, late arrivals & absences</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="attendanceChartData()"
+            [options]="attendanceChartOptions"
+            [type]="'pie'">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Chart 3: Leave Summary -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>bar_chart</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Leave Requests Status</h4>
+            <span>Approved, pending & rejected time-off</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="leaveChartData()"
+            [options]="leaveChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Chart 4: Recruitment Funnel -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>filter_alt</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Recruitment Pipeline Funnel</h4>
+            <span>Candidates stage by stage</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="recruitmentChartData()"
+            [options]="recruitmentChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Chart 5: Payroll Summary -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>stacked_bar_chart</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Payroll Expenditure Trend</h4>
+            <span>Monthly gross outlay vs net disbursed</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="payrollChartData()"
+            [options]="payrollChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Chart 6: Performance Distribution -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <div class="chart-icon-box">
+            <mat-icon>star_rate</mat-icon>
+          </div>
+          <div class="chart-title-text">
+            <h4>Performance Rating Distribution</h4>
+            <span>Quarterly employee rating spread (1-5 stars)</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [data]="performanceChartData()"
+            [options]="performanceChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Reports & CSV Export Hub -->
+  <section class="reports-export-card">
+    <div class="reports-header">
+      <div class="reports-icon-box">
+        <mat-icon>download_for_offline</mat-icon>
+      </div>
+      <div>
+        <h3 class="reports-title">Corporate Data Export & Audit Reports</h3>
+        <p class="reports-subtitle">Download live system datasets in CSV format for executive reviews, compliance filings, and external audits.</p>
+      </div>
+    </div>
+
+    <div class="export-buttons-row">
+      <button mat-stroked-button class="export-btn" (click)="exportEmployees()">
+        <mat-icon>badge</mat-icon>
+        <span>Export Employees (.csv)</span>
+      </button>
+
+      <button mat-stroked-button class="export-btn" (click)="exportAttendance()">
+        <mat-icon>schedule</mat-icon>
+        <span>Export Attendance (.csv)</span>
+      </button>
+
+      <button mat-stroked-button class="export-btn" (click)="exportLeaves()">
+        <mat-icon>flight_takeoff</mat-icon>
+        <span>Export Leaves (.csv)</span>
+      </button>
+
+      <button mat-stroked-button class="export-btn" (click)="exportPayroll()">
+        <mat-icon>payments</mat-icon>
+        <span>Export Payroll (.csv)</span>
+      </button>
+
+      <button mat-stroked-button class="export-btn" (click)="exportPerformance()">
+        <mat-icon>insights</mat-icon>
+        <span>Export Performance (.csv)</span>
+      </button>
+    </div>
+  </section>
+</div>

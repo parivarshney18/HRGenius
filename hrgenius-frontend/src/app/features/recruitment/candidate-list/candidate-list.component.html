@@ -1,0 +1,103 @@
+<div class="candidate-page-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-bar">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <a routerLink="/recruitment" class="crumb-link">
+      Job Openings
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <span class="crumb-current">Candidates Pipeline</span>
+  </nav>
+
+  @if (job(); as j) {
+    <!-- Job Header Card -->
+    <div class="job-banner-card mat-elevation-z1">
+      <div class="banner-main">
+        <div class="role-icon-box">
+          <mat-icon>work</mat-icon>
+        </div>
+        <div class="banner-titles">
+          <div class="top-meta">
+            <span class="dept-badge">
+              <mat-icon>domain</mat-icon>
+              {{ department() ? department()!.department_name : 'Dept #' + j.department_id }}
+            </span>
+            <span class="openings-pill">
+              <mat-icon>group_add</mat-icon>
+              {{ j.openings }} {{ j.openings === 1 ? 'Open Position' : 'Open Positions' }}
+            </span>
+          </div>
+          <h1 class="job-title">{{ j.job_title }}</h1>
+          <p class="job-desc">{{ j.description }}</p>
+          <div class="date-tags">
+            <span class="date-pill">
+              <mat-icon>event</mat-icon>
+              Posted: {{ j.posting_date }}
+            </span>
+            <span class="date-pill deadline">
+              <mat-icon>event_busy</mat-icon>
+              Deadline: {{ j.closing_date }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="banner-actions">
+        <button mat-flat-button color="primary" (click)="openAddCandidateDialog()" class="add-cand-btn">
+          <mat-icon>person_add</mat-icon>
+          <span>Add Applicant</span>
+        </button>
+        <button mat-stroked-button routerLink="/recruitment" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Back to Jobs</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Pipeline Stage Filter Chips -->
+    <div class="stage-filter-card mat-elevation-z1">
+      <span class="filter-title">Filter by Pipeline Stage:</span>
+      <div class="chips-row">
+        @for (st of statusCategories; track st) {
+          <button
+            type="button"
+            class="stage-chip-btn"
+            [class.active]="selectedStatusFilter() === st"
+            (click)="setStatusFilter(st)"
+          >
+            {{ st }}
+            @if (st === 'ALL') {
+              <span class="count-badge">({{ candidates().length }})</span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Loading applicant pipeline...</span>
+      </div>
+    }
+
+    <!-- Candidates Table -->
+    <div class="table-card">
+      <app-data-table
+        [data]="filteredCandidates()"
+        [columns]="columns"
+        [actions]="actions"
+        title="Candidate Applications &amp; Interview Scorecard"
+        searchPlaceholder="Search candidates by name or email..."
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 20]"
+        (actionClick)="handleActionClick($event)"
+      ></app-data-table>
+    </div>
+  }
+</div>

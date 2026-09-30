@@ -1,0 +1,168 @@
+<div class="onboarding-dialog-container">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <div class="header-icon-box">
+      <mat-icon>how_to_reg</mat-icon>
+    </div>
+    <div class="header-title-box">
+      <h2 mat-dialog-title class="dialog-title">Process Employee Onboarding</h2>
+      <p class="dialog-subtitle">
+        Candidate: <strong>{{ data.candidate.candidate_name }}</strong> &bull; {{ data.candidate.candidate_email }}
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    @if (errorMessage()) {
+      <div class="alert-box">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Candidate summary pill -->
+    <div class="candidate-summary-bar">
+      <div class="summary-item">
+        <span class="lbl">Hiring Role</span>
+        <span class="val">{{ data.job?.job_title || 'Assigned Job Position' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="lbl">Application Status</span>
+        <span class="val status-pill-selected">Selected for Hire</span>
+      </div>
+      <div class="summary-item">
+        <span class="lbl">Resume</span>
+        <span class="val code-text">{{ data.candidate.resume }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="onboarding-form">
+      <div class="form-grid">
+        <!-- Joining Date -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Effective Joining Date</mat-label>
+          <input matInput type="date" formControlName="joining_date" required />
+          <mat-icon matPrefix>event</mat-icon>
+          @if (form.get('joining_date')?.hasError('required') && form.get('joining_date')?.touched) {
+            <mat-error>Joining date is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Official Designation -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Corporate Job Title / Designation</mat-label>
+          <input matInput formControlName="designation" placeholder="e.g. Senior Frontend Engineer" required />
+          <mat-icon matPrefix>badge</mat-icon>
+          @if (form.get('designation')?.hasError('required') && form.get('designation')?.touched) {
+            <mat-error>Designation is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Assigned Department -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Assigned Department</mat-label>
+          <mat-select formControlName="assigned_department" required>
+            @for (dept of departments(); track dept.department_id) {
+              <mat-option [value]="dept.department_id">
+                {{ dept.department_name }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>domain</mat-icon>
+          @if (form.get('assigned_department')?.hasError('required') && form.get('assigned_department')?.touched) {
+            <mat-error>Department assignment is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Assigned Manager -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Assigned Manager</mat-label>
+          <mat-select formControlName="assigned_manager" required>
+            @for (mgr of managers(); track mgr.employee_id) {
+              <mat-option [value]="mgr.employee_id">
+                {{ mgr.first_name }} {{ mgr.last_name }} ({{ mgr.designation }})
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>supervisor_account</mat-icon>
+          @if (form.get('assigned_manager')?.hasError('required') && form.get('assigned_manager')?.touched) {
+            <mat-error>Manager assignment is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Document Status -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Document Status</mat-label>
+          <mat-select formControlName="document_status" required>
+            @for (st of documentStatuses; track st) {
+              <mat-option [value]="st">{{ st }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>folder_shared</mat-icon>
+        </mat-form-field>
+
+        <!-- Verification Status -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Verification Status</mat-label>
+          <mat-select formControlName="verification_status" required>
+            @for (st of verificationStatuses; track st) {
+              <mat-option [value]="st">{{ st }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>verified_user</mat-icon>
+        </mat-form-field>
+
+        <!-- Phone Number -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Primary Contact Phone</mat-label>
+          <input matInput formControlName="phone" placeholder="+1 (555) 000-0000" required />
+          <mat-icon matPrefix>phone</mat-icon>
+        </mat-form-field>
+
+        <!-- Address -->
+        <mat-form-field appearance="outline" class="grid-item">
+          <mat-label>Residential Address</mat-label>
+          <input matInput formControlName="address" placeholder="Street, City, State, Zip" required />
+          <mat-icon matPrefix>home</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isSaving() || isCompleting()">
+      Cancel
+    </button>
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="onSaveDraft()"
+      [disabled]="form.invalid || isSaving() || isCompleting()"
+      class="draft-btn"
+    >
+      @if (isSaving()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        <mat-icon>save</mat-icon>
+      }
+      <span>Save Progress</span>
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onCompleteOnboarding()"
+      [disabled]="form.invalid || isSaving() || isCompleting()"
+      class="complete-btn"
+    >
+      @if (isCompleting()) {
+        <mat-spinner diameter="18" color="accent"></mat-spinner>
+      } @else {
+        <mat-icon>person_add</mat-icon>
+      }
+      <span>Complete Onboarding</span>
+    </button>
+  </mat-dialog-actions>
+</div>

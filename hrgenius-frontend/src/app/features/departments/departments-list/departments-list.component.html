@@ -1,0 +1,93 @@
+<div class="departments-page-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-bar">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <span class="crumb-current">Departments</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header-card mat-elevation-z1">
+    <div class="header-left">
+      <div class="header-icon-box">
+        <mat-icon>domain</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1 class="page-title">Departments Management</h1>
+        <p class="page-subtitle">
+          Configure organizational units, assign leadership, and govern corporate divisions.
+        </p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="openCreateDialog()"
+        class="create-btn"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Add Department</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Stats Bar -->
+  <div class="stats-overview">
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper total">
+        <mat-icon>corporate_fare</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ departments().length }}</span>
+        <span class="stat-label">Total Departments</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper active">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ activeCount() }}</span>
+        <span class="stat-label">Active Units</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper inactive">
+        <mat-icon>pause_circle</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ inactiveCount() }}</span>
+        <span class="stat-label">Inactive Units</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading department directory...</span>
+    </div>
+  }
+
+  <!-- Data Table using Shared Component -->
+  <div class="table-card">
+    <app-data-table
+      [data]="departments()"
+      [columns]="columns"
+      [actions]="actions"
+      title="Corporate Departments Directory"
+      searchPlaceholder="Search by name, head, or description..."
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 20]"
+      (actionClick)="handleActionClick($event)"
+    ></app-data-table>
+  </div>
+</div>

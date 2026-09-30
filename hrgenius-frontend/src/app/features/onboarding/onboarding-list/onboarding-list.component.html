@@ -1,0 +1,134 @@
+<div class="onboarding-page-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-bar">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-arrow">chevron_right</mat-icon>
+    <span class="crumb-current">Employee Onboarding</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header-card mat-elevation-z1">
+    <div class="header-left">
+      <div class="header-icon-box">
+        <mat-icon>how_to_reg</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1 class="page-title">Employee Onboarding Hub</h1>
+        <p class="page-subtitle">
+          Transition selected candidate hires into active staff records with verified documentation and manager assignments.
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick action if there are other selected candidates waiting -->
+    <div class="header-right">
+      @if (selectedCandidatesWithoutOnboarding().length > 0) {
+        <button mat-flat-button color="primary" [matMenuTriggerFor]="initiateMenu" class="initiate-btn">
+          <mat-icon>person_add</mat-icon>
+          <span>Initiate for Selected Candidate ({{ selectedCandidatesWithoutOnboarding().length }})</span>
+        </button>
+        <mat-menu #initiateMenu="matMenu">
+          @for (c of selectedCandidatesWithoutOnboarding(); track c.candidate_id) {
+            <button mat-menu-item (click)="initiateOnboardingFor(c)">
+              <mat-icon>how_to_reg</mat-icon>
+              <span>{{ c.candidate_name }} ({{ c.candidate_email }})</span>
+            </button>
+          }
+        </mat-menu>
+      }
+    </div>
+  </div>
+
+  <!-- Summary Stats Bar -->
+  <div class="stats-overview">
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper pending">
+        <mat-icon>hourglass_top</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ pendingCount() }}</span>
+        <span class="stat-label">Waiting for Onboarding</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper completed">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ completedCount() }}</span>
+        <span class="stat-label">Onboarding Completed</span>
+      </div>
+    </div>
+
+    <div class="stat-pill">
+      <div class="stat-icon-wrapper total">
+        <mat-icon>assignment_ind</mat-icon>
+      </div>
+      <div class="stat-meta">
+        <span class="stat-num">{{ onboardings().length }}</span>
+        <span class="stat-label">Total Onboarding Handoffs</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Status Tabs -->
+  <div class="tabs-card mat-elevation-z1">
+    <div class="tab-buttons">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="filterTab() === 'PENDING'"
+        (click)="setFilterTab('PENDING')"
+      >
+        <mat-icon>pending_actions</mat-icon>
+        Waiting for Onboarding ({{ pendingCount() }})
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="filterTab() === 'COMPLETED'"
+        (click)="setFilterTab('COMPLETED')"
+      >
+        <mat-icon>task_alt</mat-icon>
+        Completed ({{ completedCount() }})
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="filterTab() === 'ALL'"
+        (click)="setFilterTab('ALL')"
+      >
+        <mat-icon>list</mat-icon>
+        All Handoffs ({{ onboardings().length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading candidate onboarding records...</span>
+    </div>
+  }
+
+  <!-- Data Table using Shared Component -->
+  <div class="table-card">
+    <app-data-table
+      [data]="filteredOnboardings()"
+      [columns]="columns"
+      [actions]="actions"
+      title="Candidate Onboarding Queue"
+      searchPlaceholder="Search by candidate or department..."
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 20]"
+      (actionClick)="handleActionClick($event)"
+    ></app-data-table>
+  </div>
+</div>

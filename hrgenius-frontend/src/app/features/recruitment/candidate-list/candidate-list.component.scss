@@ -1,0 +1,247 @@
+.candidate-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+
+  .crumb-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .crumb-arrow {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+  }
+
+  .crumb-current {
+    font-weight: 600;
+    color: #0f172a;
+  }
+}
+
+.job-banner-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.75rem 2rem;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  .banner-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    flex: 1;
+    min-width: 300px;
+
+    .role-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .banner-titles {
+      .top-meta {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.4rem;
+        flex-wrap: wrap;
+
+        .dept-badge, .openings-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 10px;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+
+          mat-icon {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        .dept-badge {
+          background-color: #e0f2fe;
+          color: #0284c7;
+        }
+
+        .openings-pill {
+          background-color: #dcfce7;
+          color: #15803d;
+        }
+      }
+
+      .job-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      .job-desc {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0.35rem 0 0.6rem;
+        line-height: 1.4;
+      }
+
+      .date-tags {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+
+        .date-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.75rem;
+          color: #64748b;
+          font-weight: 500;
+
+          mat-icon {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+          }
+
+          &.deadline {
+            color: #dc2626;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .banner-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    button {
+      height: 42px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .add-cand-btn {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+    }
+  }
+}
+
+.stage-filter-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+
+  .filter-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+  }
+
+  .chips-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    .stage-chip-btn {
+      padding: 5px 12px;
+      border-radius: 9999px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+
+      &.active {
+        background-color: #0284c7;
+        color: #ffffff;
+        border-color: #0284c7;
+        box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+      }
+
+      .count-badge {
+        font-weight: normal;
+        margin-left: 2px;
+      }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.table-card {
+  border-radius: 12px;
+}

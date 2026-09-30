@@ -1,0 +1,388 @@
+<div class="attendance-page-container">
+  <!-- Top Navigation & Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <div class="title-with-icon">
+        <div class="header-icon-box">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div>
+          <h1 class="page-title">Attendance & Time Tracking</h1>
+          <p class="page-subtitle">
+            Real-time punch in/out, team attendance supervision, and organizational timesheets.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button (click)="refreshAttendanceRecords()" [disabled]="isLoading()" class="refresh-btn">
+        <mat-icon [class.spin]="isLoading()">sync</mat-icon>
+        <span>Refresh</span>
+      </button>
+
+      @if (canManageAll()) {
+        <button mat-flat-button color="primary" (click)="onOpenManualEntry()" class="action-btn">
+          <mat-icon>add_alarm</mat-icon>
+          <span>Log Manual Entry</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Interactive Punch Card (Clock In / Out) -->
+  <section class="punch-card-wrapper">
+    <mat-card class="punch-card">
+      <div class="punch-card-header">
+        <div class="employee-identity">
+          <div class="avatar-badge">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="identity-info">
+            <span class="user-greeting">Welcome back,</span>
+            <h2 class="employee-name">
+              {{ currentEmployee()?.first_name || currentUser()?.name }} {{ currentEmployee()?.last_name || '' }}
+            </h2>
+            <div class="employee-meta">
+              <span class="meta-tag code">{{ currentEmployee()?.employee_code || 'EMP-001' }}</span>
+              <span class="meta-separator">•</span>
+              <span class="meta-tag">{{ currentEmployee()?.designation || currentUser()?.title }}</span>
+              <span class="meta-separator">•</span>
+              <span class="meta-tag department">{{ currentUser()?.department }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Digital Clock -->
+        <div class="digital-clock-box">
+          <div class="clock-display">
+            <mat-icon class="clock-icon">access_time</mat-icon>
+            <span class="clock-digits">{{ currentTime() | date:'hh:mm:ss a' }}</span>
+          </div>
+          <div class="clock-date">
+            {{ currentTime() | date:'EEEE, MMMM d, y' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="punch-card-body">
+        <!-- Today's Status Overview -->
+        <div class="shift-status-strip">
+          <div class="status-summary-item">
+            <span class="item-label">Check-In</span>
+            <span class="item-value" [class.highlight]="todayRecord()?.check_in">
+              {{ todayRecord()?.check_in || '--:--' }}
+            </span>
+          </div>
+
+          <div class="status-summary-divider"></div>
+
+          <div class="status-summary-item">
+            <span class="item-label">Check-Out</span>
+            <span class="item-value" [class.highlight]="todayRecord()?.check_out">
+              {{ todayRecord()?.check_out || '--:--' }}
+            </span>
+          </div>
+
+          <div class="status-summary-divider"></div>
+
+          <div class="status-summary-item">
+            <span class="item-label">Hours Logged</span>
+            <span class="item-value">
+              {{ todayRecord()?.working_hours !== null && todayRecord()?.working_hours !== undefined ? todayRecord()?.working_hours + ' hrs' : '--' }}
+            </span>
+          </div>
+
+          <div class="status-summary-divider"></div>
+
+          <div class="status-summary-item">
+            <span class="item-label">Status</span>
+            @if (todayRecord()) {
+              <span class="status-badge" [attr.data-status]="todayRecord()?.attendance_status">
+                {{ todayRecord()?.attendance_status }}
+              </span>
+            } @else {
+              <span class="status-badge not-punched">Not Checked In</span>
+            }
+          </div>
+        </div>
+
+        <!-- Punch Controls & Remarks -->
+        <div class="punch-actions-row">
+          <div class="remarks-input-wrapper">
+            <mat-form-field appearance="outline" class="remarks-field" subscriptSizing="dynamic">
+              <mat-label>Shift Remarks / Location Note (Optional)</mat-label>
+              <input
+                matInput
+                [(ngModel)]="punchRemarks"
+                placeholder="e.g. In-office shift, remote client meeting, morning sprint..."
+                [disabled]="isPunching() || (!!todayRecord()?.check_in && !!todayRecord()?.check_out)"
+              />
+              <mat-icon matPrefix>edit_note</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="buttons-group">
+            <!-- Check In Button -->
+            <button
+              mat-flat-button
+              color="primary"
+              class="punch-btn check-in-btn"
+              [disabled]="!!todayRecord()?.check_in || isPunching()"
+              (click)="onCheckIn()"
+            >
+              @if (isPunching() && !todayRecord()?.check_in) {
+                <mat-progress-spinner mode="indeterminate" diameter="20" class="btn-spinner"></mat-progress-spinner>
+              } @else {
+                <mat-icon>login</mat-icon>
+              }
+              <span>{{ (isPunching() && !todayRecord()?.check_in) ? 'Punching In...' : 'Check In' }}</span>
+            </button>
+
+            <!-- Check Out Button -->
+            <button
+              mat-flat-button
+              color="warn"
+              class="punch-btn check-out-btn"
+              [disabled]="!todayRecord()?.check_in || !!todayRecord()?.check_out || isPunching()"
+              (click)="onCheckOut()"
+            >
+              @if (isPunching() && todayRecord()?.check_in && !todayRecord()?.check_out) {
+                <mat-progress-spinner mode="indeterminate" diameter="20" class="btn-spinner"></mat-progress-spinner>
+              } @else {
+                <mat-icon>logout</mat-icon>
+              }
+              <span>{{ (isPunching() && todayRecord()?.check_in && !todayRecord()?.check_out) ? 'Punching Out...' : 'Check Out' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </section>
+
+  <!-- Metric Badges Overview -->
+  <section class="metrics-grid">
+    <div class="metric-card total">
+      <div class="metric-icon-box">
+        <mat-icon>fact_check</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Total Records</span>
+        <span class="metric-number">{{ metrics().total }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card present">
+      <div class="metric-icon-box">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Present</span>
+        <span class="metric-number">{{ metrics().present }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card late">
+      <div class="metric-icon-box">
+        <mat-icon>alarm</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Late Arrival</span>
+        <span class="metric-number">{{ metrics().late }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card half-day">
+      <div class="metric-icon-box">
+        <mat-icon>timelapse</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Half-Day</span>
+        <span class="metric-number">{{ metrics().halfDay }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card absent">
+      <div class="metric-icon-box">
+        <mat-icon>cancel</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Absent</span>
+        <span class="metric-number">{{ metrics().absent }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card hours">
+      <div class="metric-icon-box">
+        <mat-icon>speed</mat-icon>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">Avg Shift Hours</span>
+        <span class="metric-number">{{ metrics().avgHours }} <small>hrs</small></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Tabs Section -->
+  <main class="content-tabs-container">
+    <mat-tab-group
+      animationDuration="250ms"
+      class="attendance-tab-group"
+      [selectedIndex]="canManageAll() ? 0 : (isManager() ? 0 : 0)"
+    >
+      <!-- TAB 1: Organization Records (HR / ADMIN) -->
+      @if (canManageAll()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">domain</mat-icon>
+            <span>All Attendance Records ({{ filteredAllRecords().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <!-- Filter Bar -->
+            <div class="filters-card">
+              <div class="filters-header">
+                <mat-icon>tune</mat-icon>
+                <span>Filter Attendance Records</span>
+              </div>
+
+              <div class="filters-row">
+                <!-- Date Filter -->
+                <mat-form-field appearance="outline" class="filter-field date-field" subscriptSizing="dynamic">
+                  <mat-label>Shift Date</mat-label>
+                  <input
+                    matInput
+                    type="date"
+                    [ngModel]="selectedDate()"
+                    (ngModelChange)="selectedDate.set($event)"
+                  />
+                  <mat-icon matPrefix>calendar_month</mat-icon>
+                  @if (selectedDate()) {
+                    <button mat-icon-button matSuffix (click)="clearDateFilter()" matTooltip="Clear date">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  }
+                </mat-form-field>
+
+                <div class="date-quick-actions">
+                  <button mat-button class="quick-date-btn" (click)="setFilterToday()">Today</button>
+                  <button mat-button class="quick-date-btn" (click)="clearDateFilter()" [disabled]="!selectedDate()">All Dates</button>
+                </div>
+
+                <!-- Employee Filter -->
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Employee</mat-label>
+                  <mat-select
+                    [ngModel]="selectedEmployeeId()"
+                    (ngModelChange)="selectedEmployeeId.set($event)"
+                  >
+                    <mat-option value="all">All Employees</mat-option>
+                    @for (emp of employees(); track emp.employee_id) {
+                      <mat-option [value]="emp.employee_id">
+                        {{ emp.first_name }} {{ emp.last_name }} ({{ emp.employee_code }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>badge</mat-icon>
+                </mat-form-field>
+
+                <!-- Status Filter -->
+                <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+                  <mat-label>Status</mat-label>
+                  <mat-select
+                    [ngModel]="selectedStatus()"
+                    (ngModelChange)="selectedStatus.set($event)"
+                  >
+                    <mat-option value="all">All Statuses</mat-option>
+                    <mat-option value="Present">Present</mat-option>
+                    <mat-option value="Late">Late</mat-option>
+                    <mat-option value="Half-day">Half-day</mat-option>
+                    <mat-option value="Absent">Absent</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>flag</mat-icon>
+                </mat-form-field>
+
+                <!-- Reset Filters -->
+                <button
+                  mat-stroked-button
+                  class="reset-filters-btn"
+                  (click)="resetFilters()"
+                  [disabled]="!selectedDate() && selectedEmployeeId() === 'all' && selectedStatus() === 'all'"
+                >
+                  <mat-icon>refresh</mat-icon>
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- All Attendance Data Table -->
+            <div class="table-container">
+              <app-data-table
+                [data]="filteredAllRecords()"
+                [columns]="allColumns"
+                [actions]="hrActions"
+                title="Company-Wide Attendance Roster"
+                searchPlaceholder="Search by employee, date, status, or remarks..."
+                (actionClick)="onTableAction($event)"
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 2: Manager Team Attendance -->
+      @if (canViewTeam()) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">groups</mat-icon>
+            <span>My Team Attendance ({{ teamRecords().length }})</span>
+          </ng-template>
+
+          <div class="tab-content-area">
+            <div class="section-notice">
+              <mat-icon>supervised_user_circle</mat-icon>
+              <span>
+                Displaying daily punch status, working hours, and shift remarks for direct reports.
+              </span>
+            </div>
+
+            <div class="table-container">
+              <app-data-table
+                [data]="teamRecords()"
+                [columns]="teamColumns"
+                title="Direct Reports Timesheet"
+                searchPlaceholder="Search team members, designations, or dates..."
+              ></app-data-table>
+            </div>
+          </div>
+        </mat-tab>
+      }
+
+      <!-- TAB 3: Personal Attendance History (All Roles) -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-label-icon">person</mat-icon>
+          <span>My Attendance History ({{ myRecords().length }})</span>
+        </ng-template>
+
+        <div class="tab-content-area">
+          <div class="section-notice">
+            <mat-icon>history</mat-icon>
+            <span>
+              Your personal shift attendance log, timestamped check-in/out records, and calculated working hours.
+            </span>
+          </div>
+
+          <div class="table-container">
+            <app-data-table
+              [data]="myRecords()"
+              [columns]="myColumns"
+              title="Personal Attendance Ledger"
+              searchPlaceholder="Search past shift dates or remarks..."
+            ></app-data-table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </main>
+</div>

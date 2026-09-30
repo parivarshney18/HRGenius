@@ -1,0 +1,176 @@
+<div class="payslip-modal-wrapper">
+  <!-- Actions toolbar (hidden during print) -->
+  <div class="toolbar no-print">
+    <div class="toolbar-left">
+      <span class="preview-badge">Official Salary Statement</span>
+    </div>
+    <div class="toolbar-right">
+      <button mat-flat-button color="primary" (click)="onPrint()" class="print-btn">
+        <mat-icon>print</mat-icon>
+        <span>Print / Save as PDF</span>
+      </button>
+      <button mat-icon-button (click)="onClose()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Printable Payslip Document -->
+  <div class="printable-document" id="printable-payslip">
+    <!-- Corporate Header -->
+    <div class="payslip-header">
+      <div class="company-brand">
+        <div class="brand-logo">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <div class="brand-text">
+          <h1 class="company-name">HRGenius Enterprise Corp.</h1>
+          <span class="company-address">100 Innovation Boulevard, Tech District, Suite 500, CA 94016</span>
+          <span class="company-tax">Tax ID: US-EIN-884920194 • Payroll Dept.</span>
+        </div>
+      </div>
+      <div class="payslip-title-block">
+        <h2 class="statement-title">PAYSLIP STATEMENT</h2>
+        <span class="pay-period">Period: {{ data.payroll.payroll_month }}</span>
+        <span class="status-badge" [attr.data-status]="data.payroll.payroll_status">
+          {{ data.payroll.payroll_status | uppercase }}
+        </span>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- Employee Metadata Grid -->
+    <div class="employee-meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">Employee Name:</span>
+        <span class="meta-val highlight">{{ data.employee?.first_name }} {{ data.employee?.last_name }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Employee Code:</span>
+        <span class="meta-val font-mono">{{ data.employee?.employee_code || 'EMP-' + data.payroll.employee_id }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Designation:</span>
+        <span class="meta-val">{{ data.employee?.designation || 'Staff Member' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Department:</span>
+        <span class="meta-val">{{ data.department?.department_name || 'Operations' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Date of Joining:</span>
+        <span class="meta-val">{{ data.employee?.date_of_joining || '2021-01-15' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Disbursement Date:</span>
+        <span class="meta-val">{{ data.payroll.payment_date || 'End of Month Run' }}</span>
+      </div>
+    </div>
+
+    <!-- Earnings & Deductions Tables -->
+    <div class="tables-split-layout">
+      <!-- Earnings Section -->
+      <div class="table-pane earnings-pane">
+        <div class="pane-header">
+          <mat-icon>add_circle_outline</mat-icon>
+          <h3>Earnings</h3>
+        </div>
+        <table class="statement-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-right">Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic Base Salary</td>
+              <td class="text-right">{{ data.payroll.basic_salary | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Standard Corporate Allowances</td>
+              <td class="text-right">{{ data.payroll.allowances | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Performance & Retention Bonus</td>
+              <td class="text-right">{{ data.payroll.bonus | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="subtotal-row">
+              <td>Total Gross Earnings</td>
+              <td class="text-right">{{ data.payroll.gross_salary | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Deductions Section -->
+      <div class="table-pane deductions-pane">
+        <div class="pane-header">
+          <mat-icon>remove_circle_outline</mat-icon>
+          <h3>Deductions</h3>
+        </div>
+        <table class="statement-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-right">Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Federal & State Income Tax</td>
+              <td class="text-right">{{ data.payroll.tax | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Statutory Benefits & Insurance</td>
+              <td class="text-right">{{ data.payroll.deductions | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+            <tr class="empty-placeholder-row">
+              <td>Other Voluntary Withholdings</td>
+              <td class="text-right">$0.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="subtotal-row">
+              <td>Total Deductions</td>
+              <td class="text-right">{{ (data.payroll.deductions + data.payroll.tax) | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Net Pay Callout Banner -->
+    <div class="net-pay-banner">
+      <div class="net-pay-left">
+        <span class="net-pay-label">NET TAKE-HOME PAY</span>
+        <span class="formula-caption">Gross Earnings ({{ data.payroll.gross_salary | currency:'USD' }}) - Total Deductions ({{ (data.payroll.deductions + data.payroll.tax) | currency:'USD' }})</span>
+      </div>
+      <div class="net-pay-amount">
+        {{ data.payroll.net_salary | currency:'USD':'symbol':'1.2-2' }}
+      </div>
+    </div>
+
+    <!-- Signatures & Legal Disclaimer -->
+    <div class="payslip-footer">
+      <div class="signature-box">
+        <div class="sig-line"></div>
+        <span class="sig-title">Authorized Corporate Signatory</span>
+        <span class="sig-sub">Finance & Treasury Operations</span>
+      </div>
+
+      <div class="signature-box">
+        <div class="sig-line"></div>
+        <span class="sig-title">Employee Acknowledgement</span>
+        <span class="sig-sub">Signature / Digital Record</span>
+      </div>
+    </div>
+
+    <div class="security-note">
+      This is a system-generated document produced by HRGenius HRMS. Certified for electronic filing and taxation reporting.
+    </div>
+  </div>
+</div>

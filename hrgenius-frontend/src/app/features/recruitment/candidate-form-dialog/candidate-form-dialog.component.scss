@@ -1,0 +1,99 @@
+.candidate-dialog-container {
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  .header-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .header-title-box {
+    .dialog-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+      line-height: 1.2;
+    }
+
+    .dialog-subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin: 0.25rem 0 0;
+    }
+  }
+}
+
+.dialog-content {
+  padding: 0;
+  max-height: 75vh;
+  overflow-y: auto;
+
+  .alert-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #ef4444;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .candidate-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+
+    .full-width {
+      width: 100%;
+    }
+  }
+}
+
+.dialog-actions {
+  padding: 1.25rem 0 0;
+  margin: 0;
+  display: flex;
+  gap: 0.75rem;
+
+  .submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+}
