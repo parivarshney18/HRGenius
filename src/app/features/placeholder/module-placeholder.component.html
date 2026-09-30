@@ -1,0 +1,113 @@
+<div class="placeholder-container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/dashboard" class="crumb-link">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <mat-icon class="crumb-sep">chevron_right</mat-icon>
+    <span class="crumb-category">{{ category }}</span>
+    <mat-icon class="crumb-sep">chevron_right</mat-icon>
+    <span class="crumb-current">{{ title }}</span>
+  </nav>
+
+  <!-- Module Header Banner -->
+  <div class="module-header-card mat-elevation-z1">
+    <div class="header-main">
+      <div class="header-icon-box">
+        <mat-icon class="header-icon">{{ icon }}</mat-icon>
+      </div>
+      <div class="header-text">
+        <div class="category-pill">{{ category | uppercase }}</div>
+        <h1 class="header-title">{{ title }}</h1>
+        <p class="header-description">{{ description }}</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="roles-permission-box">
+        <span class="perm-label">Authorized Roles:</span>
+        <div class="perm-badges">
+          @for (r of roles; track r) {
+            <app-role-badge [role]="r"></app-role-badge>
+          }
+        </div>
+      </div>
+      <button mat-flat-button color="primary" class="action-btn">
+        <mat-icon>add</mat-icon>
+        New Entry
+      </button>
+    </div>
+  </div>
+
+  <!-- Operational Card / Table Preview -->
+  <mat-card class="content-card mat-elevation-z1">
+    <mat-card-header class="content-card-header">
+      <mat-card-title class="card-title">
+        <mat-icon>table_chart</mat-icon>
+        Module Records &amp; Live Status
+      </mat-card-title>
+      <mat-card-subtitle>
+        Active routing established &bull; Route Guard validated &bull; Ready for API data connection
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="card-table-wrapper">
+      <table mat-table [dataSource]="mockRecords" class="data-table">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Identifier</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-code">{{ row.id }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Item / Record Name</th>
+          <td mat-cell *matCellDef="let row">
+            <strong>{{ row.name }}</strong>
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-chip" [attr.data-status]="row.status">
+              {{ row.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Priority Column -->
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef>Priority</th>
+          <td mat-cell *matCellDef="let row">{{ row.priority }}</td>
+        </ng-container>
+
+        <!-- Updated Column -->
+        <ng-container matColumnDef="updated">
+          <th mat-header-cell *matHeaderCellDef>Last Modified</th>
+          <td mat-cell *matCellDef="let row">{{ row.updated }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button color="primary">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="accent">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,227 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.welcome-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.75rem 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  border: 1px solid #e0f2fe;
+
+  .greeting-badge {
+    span {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .welcome-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0.5rem 0 0.25rem;
+    letter-spacing: -0.5px;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.95rem;
+    color: #475569;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .welcome-meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.08);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+
+  .metric-card {
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+
+    .metric-card-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+
+      .metric-info {
+        display: flex;
+        flex-direction: column;
+
+        .metric-label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+          font-size: 1.6rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0.25rem 0;
+          letter-spacing: -0.5px;
+        }
+
+        .metric-trend {
+          font-size: 0.75rem;
+          color: #10b981;
+          font-weight: 600;
+        }
+      }
+
+      .metric-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          font-size: 26px;
+          width: 26px;
+          height: 26px;
+        }
+      }
+    }
+  }
+}
+
+.section-container {
+  .section-header {
+    margin-bottom: 1rem;
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 0.25rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+
+    .module-card {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        border-color: #93c5fd;
+
+        .module-arrow {
+          color: #0284c7;
+          transform: translateX(4px);
+        }
+
+        .module-icon-box {
+          background-color: #0284c7;
+          color: #ffffff;
+        }
+      }
+
+      .module-card-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+
+        .module-icon-box {
+          width: 44px;
+          height: 44px;
+          border-radius: 10px;
+          background-color: #f1f5f9;
+          color: #0f172a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+
+          mat-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        .module-text {
+          flex: 1;
+          min-width: 0;
+
+          .module-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 0.25rem;
+          }
+
+          .module-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .module-arrow {
+          color: #94a3b8;
+          transition: all 0.2s ease;
+        }
+      }
+    }
+  }
+}

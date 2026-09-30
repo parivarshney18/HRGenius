@@ -1,0 +1,105 @@
+<div class="layout-wrapper">
+  <!-- Top Bar -->
+  <mat-toolbar class="top-bar mat-elevation-z2">
+    <button
+      mat-icon-button
+      (click)="toggleSidenav()"
+      aria-label="Toggle navigation sidebar"
+      class="menu-toggle-btn"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="brand-container">
+      <div class="brand-icon-box">
+        <mat-icon class="brand-icon">hub</mat-icon>
+      </div>
+      <span class="brand-text">HRGenius</span>
+    </div>
+
+    <span class="toolbar-spacer"></span>
+
+    <!-- Topbar User Info -->
+    @if (currentUser(); as user) {
+      <div class="user-profile-section">
+        <div class="avatar-circle">
+          {{ user.name.charAt(0) }}
+        </div>
+        <div class="user-meta">
+          <span class="user-name">{{ user.name }}</span>
+          <app-role-badge [role]="user.role"></app-role-badge>
+        </div>
+
+        <button
+          mat-stroked-button
+          color="warn"
+          class="logout-btn"
+          (click)="logout()"
+          matTooltip="End current session"
+        >
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </div>
+    }
+  </mat-toolbar>
+
+  <!-- Sidenav Container -->
+  <mat-sidenav-container class="sidenav-container" autosize>
+    <!-- Sidenav Sidebar -->
+    <mat-sidenav
+      [opened]="isSidenavOpened()"
+      mode="side"
+      class="sidebar-nav"
+    >
+      <div class="sidebar-header">
+        @if (currentUser(); as user) {
+          <div class="sidebar-user-card">
+            <div class="user-avatar-lg">
+              {{ user.name.charAt(0) }}
+            </div>
+            <div class="user-details">
+              <span class="name">{{ user.name }}</span>
+              <span class="dept">{{ user.title || user.department }}</span>
+              <div class="badge-wrapper">
+                <app-role-badge [role]="user.role"></app-role-badge>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="sidebar-menu-title">
+        <span>NAVIGATION ({{ currentUser()?.role }} VIEW)</span>
+      </div>
+
+      <!-- Navigation List filtered by Role -->
+      <mat-nav-list class="nav-list">
+        @for (item of userNavItems(); track item.route) {
+          <a
+            mat-list-item
+            [routerLink]="item.route"
+            routerLinkActive="active-nav-link"
+            class="nav-item-link"
+          >
+            <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
+            <span matListItemTitle class="nav-title">{{ item.title }}</span>
+          </a>
+        }
+      </mat-nav-list>
+
+      <div class="sidebar-footer">
+        <span class="version-label">HRGenius Portal v1.0</span>
+      </div>
+    </mat-sidenav>
+
+    <!-- Main Content Body -->
+    <mat-sidenav-content class="main-content-area">
+      <main class="content-viewport">
+        <router-outlet></router-outlet>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

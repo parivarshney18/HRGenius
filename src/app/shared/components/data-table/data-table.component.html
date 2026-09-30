@@ -1,0 +1,137 @@
+<div class="data-table-container mat-elevation-z1">
+  <!-- Table Header Toolbar -->
+  <div class="table-toolbar" *ngIf="title || showSearch">
+    <div class="title-section" *ngIf="title">
+      <h3 class="table-title">{{ title }}</h3>
+    </div>
+
+    <div class="search-section" *ngIf="showSearch">
+      <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+        <mat-icon matPrefix class="search-icon">search</mat-icon>
+        <input
+          matInput
+          [placeholder]="searchPlaceholder"
+          [ngModel]="searchTerm"
+          (ngModelChange)="applyFilter($event)"
+        />
+        <button
+          *ngIf="searchTerm"
+          mat-icon-button
+          matSuffix
+          (click)="clearFilter()"
+          aria-label="Clear search"
+          type="button"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Table Body -->
+  <div class="table-responsive-wrapper">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-table-custom">
+      <!-- Dynamic Columns -->
+      <ng-container *ngFor="let col of columns" [matColumnDef]="col.key">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          [mat-sort-header]="col.key"
+          [disabled]="col.sortable === false"
+          [style.text-align]="col.align || 'left'"
+          [style.width]="col.width || 'auto'"
+        >
+          {{ col.header }}
+        </th>
+
+        <td
+          mat-cell
+          *matCellDef="let row"
+          [style.text-align]="col.align || 'left'"
+        >
+          <!-- Text Type -->
+          <ng-container *ngIf="!col.type || col.type === 'text'">
+            {{ getCellValue(row, col) }}
+          </ng-container>
+
+          <!-- Number Type -->
+          <ng-container *ngIf="col.type === 'number'">
+            {{ getCellValue(row, col) | number }}
+          </ng-container>
+
+          <!-- Currency Type -->
+          <ng-container *ngIf="col.type === 'currency'">
+            {{ getCellValue(row, col) | currency:(col.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+          </ng-container>
+
+          <!-- Date Type -->
+          <ng-container *ngIf="col.type === 'date'">
+            {{ getCellValue(row, col) | date:(col.pipeFormat || 'mediumDate') }}
+          </ng-container>
+
+          <!-- Badge Type -->
+          <ng-container *ngIf="col.type === 'badge'">
+            <span
+              class="table-badge"
+              [style.background-color]="getBadgeStyle(getCellValue(row, col), col).bg"
+              [style.color]="getBadgeStyle(getCellValue(row, col), col).color"
+              [style.border-color]="getBadgeStyle(getCellValue(row, col), col).border || 'transparent'"
+            >
+              {{ getCellValue(row, col) }}
+            </span>
+          </ng-container>
+
+          <!-- Custom Type -->
+          <ng-container *ngIf="col.type === 'custom'">
+            {{ getCellValue(row, col) }}
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="__actions" *ngIf="actions.length > 0">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let row" class="actions-cell">
+          <ng-container *ngFor="let act of actions">
+            <button
+              *ngIf="!act.visible || act.visible(row)"
+              mat-icon-button
+              [color]="act.color || 'primary'"
+              [matTooltip]="act.tooltip || act.name"
+              (click)="onAction(act.name, row, $event)"
+              type="button"
+            >
+              <mat-icon>{{ act.icon }}</mat-icon>
+            </button>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns;"
+        (click)="onRowClick(row)"
+        [class.clickable-row]="rowClick.observed"
+      ></tr>
+
+      <!-- No Data Row -->
+      <tr class="mat-row no-data-row" *matNoDataRow>
+        <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+          <div class="empty-state">
+            <mat-icon class="empty-icon">search_off</mat-icon>
+            <p class="empty-text">No records matching "{{ searchTerm }}"</p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    showFirstLastButtons
+    class="table-paginator"
+  ></mat-paginator>
+</div>

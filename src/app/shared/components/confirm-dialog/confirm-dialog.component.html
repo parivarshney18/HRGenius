@@ -1,0 +1,27 @@
+<div class="confirm-dialog-wrapper">
+  <div class="dialog-header">
+    <div class="icon-bubble" [attr.data-color]="confirmColor">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <h2 mat-dialog-title class="dialog-title">{{ title }}</h2>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="dialog-message">{{ message }}</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="onCancel()" type="button" class="cancel-btn">
+      {{ cancelText }}
+    </button>
+    <button
+      mat-flat-button
+      [color]="confirmColor"
+      (click)="onConfirm()"
+      type="button"
+      class="confirm-btn"
+    >
+      {{ confirmText }}
+    </button>
+  </mat-dialog-actions>
+</div>

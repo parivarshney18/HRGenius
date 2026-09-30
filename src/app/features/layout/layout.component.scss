@@ -1,0 +1,245 @@
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  background-color: #ffffff;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 1rem;
+  z-index: 10;
+
+  .menu-toggle-btn {
+    margin-right: 0.5rem;
+    color: #475569;
+  }
+
+  .brand-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .brand-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .brand-icon {
+        color: #ffffff;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .brand-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  .toolbar-spacer {
+    flex: 1 1 auto;
+  }
+
+  .user-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+
+    .avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+
+      .user-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    .logout-btn {
+      margin-left: 0.5rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 12px;
+      height: 36px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+.sidenav-container {
+  flex: 1;
+  height: calc(100vh - 64px);
+  background-color: #f8fafc;
+}
+
+.sidebar-nav {
+  width: 270px;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+
+  .sidebar-header {
+    padding: 1.25rem 1rem;
+
+    .sidebar-user-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .user-avatar-lg {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0284c7, #2563eb);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
+      }
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .name {
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .dept {
+          font-size: 0.75rem;
+          color: #64748b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .badge-wrapper {
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+
+  .sidebar-menu-title {
+    padding: 1rem 1rem 0.5rem;
+
+    span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.75px;
+    }
+  }
+
+  .nav-list {
+    padding: 0.5rem;
+    flex: 1;
+
+    .nav-item-link {
+      border-radius: 8px;
+      margin-bottom: 4px;
+      color: #475569;
+      transition: all 0.15s ease;
+
+      .nav-icon {
+        color: #64748b;
+        margin-right: 0.75rem;
+        transition: color 0.15s ease;
+      }
+
+      .nav-title {
+        font-weight: 500;
+        font-size: 0.875rem;
+      }
+
+      &:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+
+        .nav-icon {
+          color: #0284c7;
+        }
+      }
+
+      &.active-nav-link {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        font-weight: 600;
+
+        .nav-icon {
+          color: #0284c7;
+        }
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+
+    .version-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+  }
+}
+
+.main-content-area {
+  background-color: #f8fafc;
+  overflow-y: auto;
+}
+
+.content-viewport {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}

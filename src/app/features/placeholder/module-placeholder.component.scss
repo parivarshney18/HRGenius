@@ -1,0 +1,225 @@
+.placeholder-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+
+  .crumb-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .crumb-sep {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+  }
+
+  .crumb-category {
+    font-weight: 500;
+  }
+
+  .crumb-current {
+    font-weight: 600;
+    color: #0f172a;
+  }
+}
+
+.module-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+
+  .header-main {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    .header-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+
+      .header-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .header-text {
+      .category-pill {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #0284c7;
+        background-color: #e0f2fe;
+        padding: 2px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+      }
+
+      .header-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      .header-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0.25rem 0 0;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .roles-permission-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+
+      .perm-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+      }
+
+      .perm-badges {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+    }
+
+    .action-btn {
+      height: 40px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.content-card {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+
+  .content-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      mat-icon {
+        color: #0284c7;
+      }
+    }
+  }
+
+  .card-table-wrapper {
+    padding: 0;
+    overflow-x: auto;
+
+    .data-table {
+      width: 100%;
+
+      th {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.8rem;
+        background-color: #f8fafc;
+      }
+
+      td {
+        font-size: 0.875rem;
+        color: #1e293b;
+      }
+
+      .cell-code {
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #0284c7;
+        background: #f0f9ff;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      .status-chip {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 9999px;
+
+        &[data-status="Active"] {
+          background-color: #dcfce7;
+          color: #15803d;
+        }
+
+        &[data-status="In Review"] {
+          background-color: #fef9c3;
+          color: #854d0e;
+        }
+
+        &[data-status="Completed"] {
+          background-color: #e0f2fe;
+          color: #0369a1;
+        }
+      }
+    }
+  }
+}

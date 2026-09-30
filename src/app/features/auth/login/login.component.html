@@ -1,0 +1,107 @@
+<div class="login-container">
+  <div class="login-backdrop"></div>
+
+  <mat-card class="login-card elevation-z4">
+    <mat-card-header class="login-header">
+      <div class="logo-box">
+        <mat-icon class="logo-icon">hub</mat-icon>
+      </div>
+      <mat-card-title class="brand-title">HRGenius</mat-card-title>
+      <mat-card-subtitle class="brand-subtitle">
+        Human Resources Management Portal
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (errorMessage()) {
+        <div class="alert-box">
+          <mat-icon class="alert-icon">error_outline</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- Username Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            formControlName="username"
+            placeholder="e.g. admin, hr, manager, employee"
+            autocomplete="username"
+          />
+          <mat-icon matPrefix>person</mat-icon>
+          @if (loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched) {
+            <mat-error>Username is <strong>required</strong></mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+            <mat-error>Password is <strong>required</strong></mat-error>
+          }
+          @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
+            <mat-error>Password must be at least <strong>6 characters</strong></mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Submit Button -->
+        <div class="submit-action">
+          <button
+            mat-flat-button
+            color="primary"
+            class="full-width submit-btn"
+            type="submit"
+            [disabled]="isLoading()"
+          >
+            <mat-icon>login</mat-icon>
+            Sign In
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Demo Login Switcher -->
+      <div class="demo-section">
+        <div class="divider">
+          <span>OR QUICK SELECT ROLE DEMO</span>
+        </div>
+        <p class="demo-hint">
+          All accounts use password: <code>123456</code>
+        </p>
+        <div class="demo-chips">
+          @for (acc of quickAccounts; track acc.username) {
+            <button
+              type="button"
+              class="demo-chip-btn"
+              (click)="fillAccount(acc.username)"
+            >
+              <span class="chip-dot" [style.background-color]="acc.color"></span>
+              <strong>{{ acc.username }}</strong>
+              <small>({{ acc.role }})</small>
+            </button>
+          }
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

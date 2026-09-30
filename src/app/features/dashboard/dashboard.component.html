@@ -1,0 +1,71 @@
+<div class="dashboard-container">
+  <!-- Welcome Banner -->
+  @if (currentUser(); as user) {
+    <div class="welcome-card mat-elevation-z1">
+      <div class="welcome-content">
+        <div class="greeting-badge">
+          <span>PORTAL ACTIVE</span>
+        </div>
+        <h1 class="welcome-title">Welcome back, {{ user.name }}!</h1>
+        <p class="welcome-subtitle">
+          Signed in as <strong>{{ user.username }}</strong> with role
+          <app-role-badge [role]="user.role"></app-role-badge>
+          &bull; {{ user.title || user.department }}
+        </p>
+      </div>
+      <div class="welcome-meta-pill">
+        <mat-icon>verified_user</mat-icon>
+        <span>Role: {{ user.role }} Access Level</span>
+      </div>
+    </div>
+  }
+
+  <!-- KPI Metrics Row -->
+  <div class="metrics-grid">
+    @for (metric of roleMetrics(); track metric.label) {
+      <mat-card class="metric-card mat-elevation-z1">
+        <mat-card-content class="metric-card-content">
+          <div class="metric-info">
+            <span class="metric-label">{{ metric.label }}</span>
+            <span class="metric-value">{{ metric.value }}</span>
+            @if (metric.trend) {
+              <span class="metric-trend">{{ metric.trend }}</span>
+            }
+          </div>
+          <div class="metric-icon-box" [style.background-color]="metric.color + '15'">
+            <mat-icon [style.color]="metric.color">{{ metric.icon }}</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Available Modules Section -->
+  <div class="section-container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Accessible Modules for {{ currentUser()?.role }}</h2>
+        <p class="section-subtitle">
+          Based on role-based access control, the following features are enabled for your account.
+        </p>
+      </div>
+    </div>
+
+    <div class="modules-grid">
+      @for (item of userNavItems(); track item.route) {
+        <mat-card class="module-card mat-elevation-z1" [routerLink]="item.route">
+          <mat-card-content class="module-card-content">
+            <div class="module-icon-box">
+              <mat-icon>{{ item.icon }}</mat-icon>
+            </div>
+            <div class="module-text">
+              <h3 class="module-title">{{ item.title }}</h3>
+              <p class="module-desc">{{ item.description }}</p>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward</mat-icon>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </div>
+</div>
