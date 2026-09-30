@@ -1,10 +1,26 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { User, UserRole, NavItem } from '../models/user.model';
+import { environment } from '../../../environments/environment';
 
 interface MockAccount {
   user: User;
   passwordHash: string; // "123456"
+}
+
+interface LoginApiResponse {
+  token?: string;
+  access_token?: string;
+  token_type?: string;
+  user_id?: number;
+  username: string;
+  email?: string;
+  role: string;
+  employee_id?: number;
+  employee_name?: string;
 }
 
 @Injectable({
@@ -12,6 +28,7 @@ interface MockAccount {
 })
 export class AuthService {
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
   private readonly STORAGE_KEY = 'hrgenius_auth_user';
 
   // Mock users per requirements
@@ -19,22 +36,28 @@ export class AuthService {
     {
       user: {
         id: 'u-admin-1',
+        user_id: 1,
+        employee_id: 1,
         username: 'admin',
-        name: 'Alex Mercer',
+        name: 'Arun Kumar',
+        employee_name: 'Arun Kumar',
         role: 'ADMIN',
-        email: 'alex.admin@hrgenius.com',
+        email: 'admin@hrgenius.com',
         department: 'Information Technology',
-        title: 'System Administrator'
+        title: 'VP of Technology'
       },
       passwordHash: '123456'
     },
     {
       user: {
         id: 'u-hr-2',
+        user_id: 2,
+        employee_id: 2,
         username: 'hr',
-        name: 'Sarah Jenkins',
+        name: 'Priya Sharma',
+        employee_name: 'Priya Sharma',
         role: 'HR',
-        email: 'sarah.hr@hrgenius.com',
+        email: 'hr@hrgenius.com',
         department: 'Human Resources',
         title: 'HR Operations Lead'
       },
@@ -43,11 +66,14 @@ export class AuthService {
     {
       user: {
         id: 'u-mgr-3',
+        user_id: 3,
+        employee_id: 3,
         username: 'manager',
-        name: 'Marcus Vance',
+        name: 'Vikram Malhotra',
+        employee_name: 'Vikram Malhotra',
         role: 'MANAGER',
-        email: 'marcus.mgr@hrgenius.com',
-        department: 'Engineering',
+        email: 'manager@hrgenius.com',
+        department: 'Engineering & Technology',
         title: 'Engineering Manager'
       },
       passwordHash: '123456'
@@ -55,12 +81,15 @@ export class AuthService {
     {
       user: {
         id: 'u-emp-4',
+        user_id: 4,
+        employee_id: 4,
         username: 'employee',
-        name: 'Elena Rostova',
+        name: 'Ananya Iyer',
+        employee_name: 'Ananya Iyer',
         role: 'EMPLOYEE',
-        email: 'elena.emp@hrgenius.com',
-        department: 'Product Design',
-        title: 'UI/UX Designer'
+        email: 'employee@hrgenius.com',
+        department: 'Engineering & Technology',
+        title: 'Senior Software Engineer'
       },
       passwordHash: '123456'
     }
@@ -204,10 +233,27 @@ export class AuthService {
     return this.allNavItems.filter(item => item.roles.includes(user.role));
   });
 
+  /**
+   * Helper to normalize roles (handles both 'ADMIN' and 'ROLE_ADMIN', etc.)
+   */
+  public normalizeRole(role?: string | null): UserRole {
+    if (!role) return 'EMPLOYEE';
+    const clean = role.replace(/^ROLE_/, '').toUpperCase();
+    if (clean === 'ADMIN') return 'ADMIN';
+    if (clean === 'HR') return 'HR';
+    if (clean === 'MANAGER') return 'MANAGER';
+    return 'EMPLOYEE';
+  }
+
   private getStoredUser(): User | null {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY);
-      return data ? (JSON.parse(data) as User) : null;
+      if (!data) return null;
+      const user = JSON.parse(data) as User;
+      if (user && user.role) {
+        user.role = this.normalizeRole(user.role);
+      }
+      return user;
     } catch {
       return null;
     }
@@ -216,25 +262,84 @@ export class AuthService {
   /**
    * Log in with username and password
    */
-  public login(username: string, password: string): { success: boolean; message?: string } {
-    const trimmedUser = username.trim().toLowerCase();
+  public login(username: string, password: string): Observable<{ success: boolean; message?: string }> {
+    const trimmedUser = username.trim();
+
+    if (!environment.useMock) {
+      return this.http.post<LoginApiResponse>(`${environment.apiUrl}/auth/login`, {
+        username: trimmedUser,
+        password
+      }).pipe(
+        map(res => {
+          const token = res.token || res.access_token || '';
+          const role = this.normalizeRole(res.role);
+          const employeeName = res.employee_name || res.username;
+          const employeeId = res.employee_id != null ? Number(res.employee_id) : null;
+
+          const user: User = {
+            id: res.user_id || employeeId || res.username,
+            user_id: res.user_id,
+            username: res.username,
+            name: employeeName,
+            role,
+            email: res.email || `${res.username}@hrgenius.com`,
+            employee_id: employeeId,
+            employee_name: employeeName,
+            token
+          };
+
+          // Store auth data in localStorage
+          localStorage.setItem('hrgenius_jwt_token', token);
+          localStorage.setItem('token', token);
+          localStorage.setItem('role', role);
+          localStorage.setItem('username', res.username);
+          if (employeeId != null) {
+            localStorage.setItem('employee_id', String(employeeId));
+          }
+          if (employeeName) {
+            localStorage.setItem('employee_name', employeeName);
+          }
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+          this._currentUser.set(user);
+
+          return { success: true };
+        }),
+        catchError(err => {
+          const message = err?.error?.message || 'Invalid username or password';
+          return of({ success: false, message });
+        })
+      );
+    }
+
+    // In-memory mock path
     const account = this.mockAccounts.find(
-      acc => acc.user.username.toLowerCase() === trimmedUser
+      acc => acc.user.username.toLowerCase() === trimmedUser.toLowerCase()
     );
 
     if (!account) {
-      return { success: false, message: 'Invalid username. Try admin, hr, manager, or employee.' };
+      return of({ success: false, message: 'Invalid username. Try admin, hr, manager, or employee.' });
     }
 
     if (account.passwordHash !== password) {
-      return { success: false, message: 'Invalid password. Hint: 123456' };
+      return of({ success: false, message: 'Invalid password. Hint: 123456' });
     }
 
     // Persist to localStorage
+    const mockToken = `mock-jwt-token-${account.user.username}`;
+    localStorage.setItem('hrgenius_jwt_token', mockToken);
+    localStorage.setItem('token', mockToken);
+    localStorage.setItem('role', account.user.role);
+    localStorage.setItem('username', account.user.username);
+    if (account.user.employee_id != null) {
+      localStorage.setItem('employee_id', String(account.user.employee_id));
+    }
+    if (account.user.employee_name || account.user.name) {
+      localStorage.setItem('employee_name', account.user.employee_name || account.user.name);
+    }
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(account.user));
     this._currentUser.set(account.user);
 
-    return { success: true };
+    return of({ success: true });
   }
 
   /**
@@ -242,6 +347,12 @@ export class AuthService {
    */
   public logout(): void {
     localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem('hrgenius_jwt_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('username');
+    localStorage.removeItem('employee_id');
+    localStorage.removeItem('employee_name');
     this._currentUser.set(null);
     this.router.navigate(['/login']);
   }
@@ -252,6 +363,7 @@ export class AuthService {
   public hasRole(roles: UserRole[]): boolean {
     const user = this._currentUser();
     if (!user) return false;
-    return roles.includes(user.role);
+    return roles.includes(this.normalizeRole(user.role));
   }
 }
+

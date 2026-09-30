@@ -13,6 +13,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 import { AuthService } from '../../core/services/auth.service';
+import { DashboardService } from '../../core/services/dashboard.service';
 import { EmployeeService } from '../../core/services/employee.service';
 import { DepartmentService } from '../../core/services/department.service';
 import { JobService } from '../../core/services/job.service';
@@ -22,7 +23,9 @@ import { AttendanceService } from '../../core/services/attendance.service';
 import { PayrollService } from '../../core/services/payroll.service';
 import { PerformanceService } from '../../core/services/performance.service';
 
+import { DashboardStats } from '../../core/models/dashboard.model';
 import { Employee } from '../../core/models/employee.model';
+
 import { Department } from '../../core/models/department.model';
 import { Job } from '../../core/models/job.model';
 import { Candidate } from '../../core/models/candidate.model';
@@ -85,6 +88,7 @@ export function downloadCsv(filename: string, rows: Record<string, any>[]): void
 })
 export class DashboardComponent implements OnInit {
   public readonly authService = inject(AuthService);
+  private readonly dashboardService = inject(DashboardService);
   private readonly employeeService = inject(EmployeeService);
   private readonly departmentService = inject(DepartmentService);
   private readonly jobService = inject(JobService);
@@ -103,8 +107,9 @@ export class DashboardComponent implements OnInit {
   public readonly isEmployee = computed(() => this.userRole() === 'EMPLOYEE');
 
   public readonly isLoading = signal<boolean>(true);
+  public readonly stats = signal<DashboardStats | null>(null);
 
-  // Raw Datasets
+  // Raw Datasets (for CSV exports & details)
   public readonly employees = signal<Employee[]>([]);
   public readonly departments = signal<Department[]>([]);
   public readonly jobs = signal<Job[]>([]);
@@ -114,17 +119,18 @@ export class DashboardComponent implements OnInit {
   public readonly payrolls = signal<Payroll[]>([]);
   public readonly performances = signal<Performance[]>([]);
 
-  // Mandatory KPI Cards
-  public readonly totalEmployeesCount = computed(() => this.employees().length);
+  // Mandatory KPI Cards (grounded in backend stats)
+  public readonly totalEmployeesCount = computed(() => {
+    return this.stats()?.total_employees ?? this.employees().length;
+  });
   public readonly newHiresCount = computed(() => {
-    // Employees joined in 2026 or last 90 days
-    return this.employees().filter(e => e.date_of_joining && e.date_of_joining.startsWith('2026') || e.date_of_joining.startsWith('2025')).length;
+    return this.stats()?.new_hires ?? this.employees().filter(e => e.date_of_joining && (e.date_of_joining.startsWith('2026') || e.date_of_joining.startsWith('2025'))).length;
   });
   public readonly openPositionsCount = computed(() => {
-    return this.jobs().reduce((sum, j) => sum + (j.openings || 1), 0);
+    return this.stats()?.open_positions ?? this.jobs().reduce((sum, j) => sum + (j.openings || 1), 0);
   });
   public readonly pendingLeavesCount = computed(() => {
-    return this.leaves().filter(l => l.leave_status === 'PENDING').length;
+    return this.stats()?.pending_leaves ?? this.leaves().filter(l => l.leave_status === 'PENDING').length;
   });
 
   // Role-Specific Metric Computations
@@ -132,18 +138,21 @@ export class DashboardComponent implements OnInit {
     const today = new Date().toISOString().split('T')[0];
     const user = this.currentUser();
     if (!user) return null;
-    const emp = this.employees().find(e => e.email.toLowerCase() === user.email.toLowerCase());
-    if (!emp) return null;
-    return this.attendances().find(a => String(a.employee_id) === String(emp.employee_id) && a.attendance_date === today) || null;
+    return this.attendances().find(a =>
+      (user.employee_id && String(a.employee_id) === String(user.employee_id)) ||
+      (a.attendance_date === today)
+    ) || null;
   });
 
   public readonly myPendingLeaves = computed(() => {
     const user = this.currentUser();
     if (!user) return 0;
-    const emp = this.employees().find(e => e.email.toLowerCase() === user.email.toLowerCase());
-    if (!emp) return 0;
-    return this.leaves().filter(l => String(l.employee_id) === String(emp.employee_id) && l.leave_status === 'PENDING').length;
+    return this.leaves().filter(l =>
+      (user.employee_id ? String(l.employee_id) === String(user.employee_id) : true) &&
+      l.leave_status === 'PENDING'
+    ).length;
   });
+
 
   public readonly teamMembersCount = computed(() => {
     const user = this.currentUser();
@@ -155,9 +164,23 @@ export class DashboardComponent implements OnInit {
 
   // Chart 1: Department-wise Headcount
   public readonly deptChartData = computed<ChartData<'doughnut', number[], string>>(() => {
+    const st = this.stats();
+    if (st && st.department_wise_headcount && Object.keys(st.department_wise_headcount).length > 0) {
+      return {
+        labels: Object.keys(st.department_wise_headcount),
+        datasets: [
+          {
+            data: Object.values(st.department_wise_headcount),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#64748b'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }
+        ]
+      };
+    }
+
     const emps = this.employees();
     const depts = this.departments();
-
     const counts: Record<string, number> = {};
     for (const d of depts) {
       counts[d.department_name] = emps.filter(e => String(e.department_id) === String(d.department_id)).length;
@@ -186,6 +209,21 @@ export class DashboardComponent implements OnInit {
 
   // Chart 2: Attendance Summary
   public readonly attendanceChartData = computed<ChartData<'pie', number[], string>>(() => {
+    const st = this.stats();
+    if (st && st.attendance_summary) {
+      return {
+        labels: Object.keys(st.attendance_summary),
+        datasets: [
+          {
+            data: Object.values(st.attendance_summary),
+            backgroundColor: ['#22c55e', '#f59e0b', '#a855f7', '#ef4444'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }
+        ]
+      };
+    }
+
     const atts = this.attendances();
     const present = atts.filter(a => a.attendance_status === 'Present').length;
     const late = atts.filter(a => a.attendance_status === 'Late').length;
@@ -215,6 +253,21 @@ export class DashboardComponent implements OnInit {
 
   // Chart 3: Leave Summary
   public readonly leaveChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const st = this.stats();
+    if (st && st.leave_summary) {
+      return {
+        labels: Object.keys(st.leave_summary),
+        datasets: [
+          {
+            label: 'Leave Requests',
+            data: Object.values(st.leave_summary),
+            backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+            borderRadius: 6
+          }
+        ]
+      };
+    }
+
     const lvs = this.leaves();
     const approved = lvs.filter(l => l.leave_status === 'APPROVED').length;
     const pending = lvs.filter(l => l.leave_status === 'PENDING').length;
@@ -246,6 +299,21 @@ export class DashboardComponent implements OnInit {
 
   // Chart 4: Recruitment Funnel
   public readonly recruitmentChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const st = this.stats();
+    if (st && st.recruitment_funnel) {
+      return {
+        labels: Object.keys(st.recruitment_funnel),
+        datasets: [
+          {
+            label: 'Candidates in Pipeline',
+            data: Object.values(st.recruitment_funnel),
+            backgroundColor: ['#38bdf8', '#818cf8', '#fbbf24', '#34d399', '#ef4444'],
+            borderRadius: 6
+          }
+        ]
+      };
+    }
+
     const cands = this.candidates();
     const applied = cands.filter(c => c.application_status === 'Applied').length;
     const shortlisted = cands.filter(c => c.application_status === 'Shortlisted').length;
@@ -279,6 +347,27 @@ export class DashboardComponent implements OnInit {
 
   // Chart 5: Payroll Summary (Gross vs Net)
   public readonly payrollChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const st = this.stats();
+    if (st && Array.isArray(st.payroll_summary) && st.payroll_summary.length > 0) {
+      return {
+        labels: st.payroll_summary.map((p: any) => p.month || p.payroll_month),
+        datasets: [
+          {
+            label: 'Gross Outlay ($)',
+            data: st.payroll_summary.map((p: any) => Number(p.gross_salary) || 0),
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          },
+          {
+            label: 'Net Payout ($)',
+            data: st.payroll_summary.map((p: any) => Number(p.net_salary) || 0),
+            backgroundColor: '#10b981',
+            borderRadius: 6
+          }
+        ]
+      };
+    }
+
     const pays = this.payrolls();
     const augGross = pays.filter(p => p.payroll_month === '2026-08').reduce((s, p) => s + (p.gross_salary || 0), 0);
     const augNet = pays.filter(p => p.payroll_month === '2026-08').reduce((s, p) => s + (p.net_salary || 0), 0);
@@ -322,6 +411,21 @@ export class DashboardComponent implements OnInit {
 
   // Chart 6: Performance Rating Distribution
   public readonly performanceChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const st = this.stats();
+    if (st && st.rating_distribution) {
+      return {
+        labels: Object.keys(st.rating_distribution),
+        datasets: [
+          {
+            label: 'Appraisal Ratings',
+            data: Object.values(st.rating_distribution),
+            backgroundColor: ['#eab308', '#f59e0b', '#fb923c', '#f87171', '#ef4444'],
+            borderRadius: 6
+          }
+        ]
+      };
+    }
+
     const perfs = this.performances();
     const star5 = perfs.filter(p => p.rating === 5).length;
     const star4 = perfs.filter(p => p.rating === 4).length;
@@ -360,39 +464,32 @@ export class DashboardComponent implements OnInit {
   public loadAllData(): void {
     this.isLoading.set(true);
 
-    this.employeeService.getAll().subscribe(emps => {
-      this.employees.set(emps);
+    this.dashboardService.getStats().subscribe({
+      next: (st) => {
+        this.stats.set(st);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+      }
     });
 
-    this.departmentService.getAll().subscribe(depts => {
-      this.departments.set(depts);
-    });
-
-    this.jobService.getAll().subscribe(jobs => {
-      this.jobs.set(jobs);
-    });
-
-    this.candidateService.getAll().subscribe(cands => {
-      this.candidates.set(cands);
-    });
-
-    this.leaveService.getAll().subscribe(lvs => {
-      this.leaves.set(lvs);
-    });
-
-    this.attendanceService.getAll().subscribe(atts => {
-      this.attendances.set(atts);
-    });
-
-    this.payrollService.getAll().subscribe(pays => {
-      this.payrolls.set(pays);
-    });
-
-    this.performanceService.getAll().subscribe(perfs => {
-      this.performances.set(perfs);
-      this.isLoading.set(false);
-    });
+    if (this.isAdmin() || this.isHR()) {
+      this.employeeService.getAll().subscribe(emps => this.employees.set(emps));
+      this.departmentService.getAll().subscribe(depts => this.departments.set(depts));
+      this.jobService.getAll().subscribe(jobs => this.jobs.set(jobs));
+      this.candidateService.getAll().subscribe(cands => this.candidates.set(cands));
+      this.leaveService.getAll().subscribe(lvs => this.leaves.set(lvs));
+      this.attendanceService.getAll().subscribe(atts => this.attendances.set(atts));
+      this.payrollService.getAll().subscribe(pays => this.payrolls.set(pays));
+      this.performanceService.getAll().subscribe(perfs => this.performances.set(perfs));
+    } else {
+      this.departmentService.getAll().subscribe(depts => this.departments.set(depts));
+      this.attendanceService.getMyAttendance().subscribe(atts => this.attendances.set(atts));
+      this.leaveService.getMyLeaves().subscribe(lvs => this.leaves.set(lvs));
+    }
   }
+
 
   // CSV Exports
   public exportEmployees(): void {

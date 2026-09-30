@@ -66,15 +66,21 @@ export class LoginComponent {
     this.errorMessage.set(null);
 
     const { username, password } = this.loginForm.value;
-    const result = this.authService.login(username, password);
-
-    this.isLoading.set(false);
-
-    if (result.success) {
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-      this.router.navigateByUrl(returnUrl);
-    } else {
-      this.errorMessage.set(result.message || 'Login failed. Please verify your credentials.');
-    }
+    this.authService.login(username, password).subscribe({
+      next: (result) => {
+        this.isLoading.set(false);
+        if (result.success) {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          this.errorMessage.set(result.message || 'Login failed. Please verify your credentials.');
+        }
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(err?.error?.message || 'Login failed. Please verify your credentials.');
+      }
+    });
   }
+
 }

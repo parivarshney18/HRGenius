@@ -8,3 +8,6 @@ export * from './attendance.model';
 export * from './leave.model';
 export * from './payroll.model';
 export * from './performance.model';
+export * from './dashboard.model';
+export * from './profile.model';
+

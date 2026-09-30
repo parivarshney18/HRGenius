@@ -137,6 +137,19 @@ export class PerformanceService {
   }
 
   /**
+   * Retrieve reviews for current logged in employee
+   */
+  public getMyReviews(): Observable<Performance[]> {
+    if (!environment.useMock) {
+      return this.http.get<Performance[]>(`${this.apiUrl}/my`);
+    }
+    const empId = localStorage.getItem('employee_id');
+    const list = empId ? this.performances.filter(p => String(p.employee_id) === String(empId)) : this.performances;
+    return of([...list]).pipe(delay(200));
+  }
+
+
+  /**
    * Retrieve performance records for an employee
    */
   public getByEmployee(employeeId: string | number): Observable<Performance[]> {

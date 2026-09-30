@@ -297,11 +297,12 @@ export class EmployeeService {
    */
   public getByDepartment(deptId: string | number): Observable<Employee[]> {
     if (!environment.useMock) {
-      return this.http.get<Employee[]>(`${this.apiUrl}/department/${deptId}`);
+      return this.http.get<Employee[]>(`${this.apiUrl}?department_id=${deptId}`);
     }
     const filtered = this.employees.filter(e => String(e.department_id) === String(deptId));
     return of([...filtered]).pipe(delay(200));
   }
+
 
   /**
    * Create a new employee

@@ -207,6 +207,19 @@ export class LeaveService {
   }
 
   /**
+   * Retrieve current authenticated employee leave requests
+   */
+  public getMyLeaves(): Observable<Leave[]> {
+    if (!environment.useMock) {
+      return this.http.get<Leave[]>(`${this.apiUrl}/my`);
+    }
+    const empId = localStorage.getItem('employee_id');
+    const list = empId ? this.leaves.filter(l => String(l.employee_id) === String(empId)) : this.leaves;
+    return of([...list]).pipe(delay(200));
+  }
+
+
+  /**
    * Retrieve leaves by employee ID
    */
   public getByEmployee(employeeId: string | number): Observable<Leave[]> {

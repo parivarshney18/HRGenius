@@ -15,9 +15,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/services/auth.service';
+import { ProfileService } from '../../core/services/profile.service';
 import { EmployeeService } from '../../core/services/employee.service';
 import { DepartmentService } from '../../core/services/department.service';
 import { PayrollService } from '../../core/services/payroll.service';
+import { UserProfile } from '../../core/models/profile.model';
 import { Employee } from '../../core/models/employee.model';
 import { Department } from '../../core/models/department.model';
 import { Payroll } from '../../core/models/payroll.model';
@@ -53,12 +55,14 @@ export interface SalaryRecordDisplay extends Payroll {
 })
 export class ProfileComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly profileService = inject(ProfileService);
   private readonly employeeService = inject(EmployeeService);
   private readonly departmentService = inject(DepartmentService);
   private readonly payrollService = inject(PayrollService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   public readonly router = inject(Router);
+
 
   // Current logged in user & role
   public readonly currentUser = this.authService.currentUser;
@@ -132,45 +136,127 @@ export class ProfileComponent implements OnInit {
   public loadInitialData(): void {
     this.isLoading.set(true);
 
-    this.departmentService.getAll().subscribe({
-      next: depts => {
-        this.allDepartments.set(depts);
-
-        this.employeeService.getAll().subscribe({
-          next: emps => {
-            this.allEmployees.set(emps);
-
-            const user = this.currentUser();
-            const matchedEmp = this.findMatchingEmployee(user, emps);
-
-            if (matchedEmp) {
-              this.selectedEmployeeId = matchedEmp.employee_id;
-              this.loadProfile(matchedEmp);
-            } else if (emps.length > 0) {
-              this.selectedEmployeeId = emps[0].employee_id;
-              this.loadProfile(emps[0]);
-            } else {
-              this.isLoading.set(false);
-            }
-          },
-          error: () => {
-            this.isLoading.set(false);
-            this.snackBar.open('Failed to load employee directory', 'Close', { duration: 3000 });
-          }
-        });
+    // Load current authenticated user profile
+    this.profileService.getMyProfile().subscribe({
+      next: (profile) => {
+        this.applyProfile(profile);
+        this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load department records', 'Close', { duration: 3000 });
       }
     });
+
+    // If Admin/HR, also load employee and department directories for switching profiles
+    if (this.canSelectEmployee()) {
+      this.departmentService.getAll().subscribe({
+        next: depts => this.allDepartments.set(depts),
+        error: () => {}
+      });
+
+      this.employeeService.getAll().subscribe({
+        next: emps => this.allEmployees.set(emps),
+        error: () => {}
+      });
+    }
   }
 
   public onEmployeeChange(empId: string | number): void {
     if (!this.canSelectEmployee()) return;
-    const emp = this.allEmployees().find(e => String(e.employee_id) === String(empId));
-    if (emp) {
-      this.loadProfile(emp);
+    this.isLoading.set(true);
+    this.profileService.getProfileById(empId).subscribe({
+      next: (profile) => {
+        this.applyProfile(profile);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        const emp = this.allEmployees().find(e => String(e.employee_id) === String(empId));
+        if (emp) {
+          this.loadProfile(emp);
+        } else {
+          this.isLoading.set(false);
+        }
+      }
+    });
+  }
+
+  public applyProfile(profile: UserProfile): void {
+    const emp: Employee = {
+      employee_id: profile.employee_id || (profile.user_id as number) || 1,
+      employee_code: profile.employee_code || `EMP-${String(profile.employee_id || 1).padStart(3, '0')}`,
+      first_name: profile.first_name || (profile.full_name?.split(' ')[0] || ''),
+      last_name: profile.last_name || (profile.full_name?.split(' ').slice(1).join(' ') || ''),
+      date_of_birth: profile.date_of_birth || '',
+      gender: profile.gender || 'Not specified',
+      email: profile.email || `${profile.username}@hrgenius.com`,
+      phone: profile.phone || '',
+      address: profile.address || '',
+      date_of_joining: profile.date_of_joining || '',
+      department_id: profile.department_id || 1,
+      manager_id: profile.manager_id || null,
+      designation: profile.designation || '',
+      employment_type: profile.employment_type || 'Full-Time',
+      status: profile.status || 'Active'
+    };
+
+    this.selectedEmployee.set(emp);
+    this.selectedEmployeeId = emp.employee_id;
+
+    if (profile.department_name) {
+      this.department.set({
+        department_id: profile.department_id || 1,
+        department_name: profile.department_name,
+        description: '',
+        department_head: '',
+        status: 'Active'
+      });
+    }
+
+
+    if (profile.manager_name) {
+      const mgrNameParts = profile.manager_name.split(' ');
+      this.manager.set({
+        employee_id: profile.manager_id || 0,
+        employee_code: '',
+        first_name: mgrNameParts[0] || '',
+        last_name: mgrNameParts.slice(1).join(' ') || '',
+        email: '',
+        designation: 'Reporting Manager',
+        status: 'Active',
+        department_id: profile.department_id || 1,
+        manager_id: null,
+        employment_type: 'Full-Time',
+        date_of_birth: '',
+        date_of_joining: '',
+        gender: '',
+        phone: '',
+        address: ''
+      });
+    } else {
+      this.manager.set(null);
+    }
+
+    if (profile.salary_history && profile.salary_history.length > 0) {
+      const sorted = [...profile.salary_history]
+        .sort((a, b) => b.payroll_month.localeCompare(a.payroll_month))
+        .map(r => ({
+          ...r,
+          deductions_total: (Number(r.deductions) || 0) + (Number(r.tax) || 0)
+        }));
+      this.salaryHistory.set(sorted);
+    } else {
+      this.payrollService.getByEmployee(emp.employee_id).subscribe({
+        next: records => {
+          const sorted = [...records]
+            .sort((a, b) => b.payroll_month.localeCompare(a.payroll_month))
+            .map(r => ({
+              ...r,
+              deductions_total: (Number(r.deductions) || 0) + (Number(r.tax) || 0)
+            }));
+          this.salaryHistory.set(sorted);
+        },
+        error: () => this.salaryHistory.set([])
+      });
     }
   }
 
@@ -239,6 +325,11 @@ export class ProfileComponent implements OnInit {
   private findMatchingEmployee(user: User | null, emps: Employee[]): Employee | undefined {
     if (!user) return emps[0];
 
+    if (user.employee_id) {
+      const byEmpId = emps.find(e => e.employee_id === user.employee_id);
+      if (byEmpId) return byEmpId;
+    }
+
     const byEmail = emps.find(e => e.email.toLowerCase() === user.email.toLowerCase());
     if (byEmail) return byEmail;
 
@@ -252,7 +343,8 @@ export class ProfileComponent implements OnInit {
 
     if (user.role === 'ADMIN') return emps.find(e => e.employee_id === 1);
     if (user.role === 'HR') return emps.find(e => e.employee_id === 2);
-    if (user.role === 'MANAGER') return emps.find(e => e.employee_id === 4);
-    return emps.find(e => e.employee_id === 5);
+    if (user.role === 'MANAGER') return emps.find(e => e.employee_id === 3);
+    return emps.find(e => e.employee_id === 4);
   }
 }
+

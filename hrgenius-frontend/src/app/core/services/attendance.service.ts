@@ -216,6 +216,28 @@ export class AttendanceService {
   }
 
   /**
+   * Retrieve current authenticated employee attendance history
+   */
+  public getMyAttendance(): Observable<Attendance[]> {
+    if (!environment.useMock) {
+      return this.http.get<Attendance[]>(`${this.apiUrl}/my`);
+    }
+    const empId = localStorage.getItem('employee_id');
+    const list = empId ? this.attendances.filter(a => String(a.employee_id) === String(empId)) : this.attendances;
+    return of([...list]).pipe(delay(200));
+  }
+
+  /**
+   * Retrieve team attendance for Manager
+   */
+  public getTeamAttendance(): Observable<Attendance[]> {
+    if (!environment.useMock) {
+      return this.http.get<Attendance[]>(`${this.apiUrl}/team`);
+    }
+    return of([...this.attendances]).pipe(delay(200));
+  }
+
+  /**
    * Retrieve attendance records for a specific employee
    */
   public getByEmployee(employeeId: string | number): Observable<Attendance[]> {
@@ -233,6 +255,7 @@ export class AttendanceService {
     if (!environment.useMock) {
       return this.http.get<Attendance[]>(`${this.apiUrl}/manager/${managerId}`);
     }
+
     return this.employeeService.getAll().pipe(
       map(allEmployees => {
         const reportIds = new Set(

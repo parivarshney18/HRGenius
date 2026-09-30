@@ -269,21 +269,27 @@ export class CandidateService {
     return of({ ...updated }).pipe(delay(300));
   }
 
-  /**
-   * Update candidate status, interview date and interview result
-   */
   public updateStatus(
     candidateId: string | number,
     status: string,
     interviewDate?: string | null,
     interviewResult?: string | null
   ): Observable<Candidate> {
+    if (!environment.useMock) {
+      return this.http.put<Candidate>(`${this.apiUrl}/${candidateId}/status`, {
+        application_status: status,
+        interview_date: interviewDate !== undefined ? interviewDate : null,
+        interview_result: interviewResult !== undefined ? interviewResult : null
+      });
+    }
+
     return this.update(candidateId, {
       application_status: status,
       interview_date: interviewDate !== undefined ? interviewDate : null,
       interview_result: interviewResult !== undefined ? interviewResult : null
     });
   }
+
 
   /**
    * Delete candidate

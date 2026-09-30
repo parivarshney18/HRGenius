@@ -455,4 +455,35 @@ export class PayrollService {
     }
     return of(false).pipe(delay(150));
   }
+
+  /**
+   * Retrieve current authenticated employee payslips
+   */
+  public getMyPayslips(): Observable<Payroll[]> {
+    if (!environment.useMock) {
+      return this.http.get<Payroll[]>(`${this.apiUrl}/my`);
+    }
+    const empId = localStorage.getItem('employee_id');
+    const list = empId ? this.payrolls.filter(p => String(p.employee_id) === String(empId)) : this.payrolls;
+    return of([...list]).pipe(delay(200));
+  }
+
+  /**
+   * Retrieve employee salary history
+   */
+  public getSalaryHistory(employeeId: string | number): Observable<Payroll[]> {
+    if (!environment.useMock) {
+      return this.http.get<Payroll[]>(`${this.apiUrl}/history/${employeeId}`);
+    }
+    const list = this.payrolls.filter(p => String(p.employee_id) === String(employeeId));
+    return of([...list]).pipe(delay(200));
+  }
+
+  /**
+   * Download payslip PDF blob
+   */
+  public downloadPayslipPdf(id: string | number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/payslip`, { responseType: 'blob' });
+  }
 }
+
