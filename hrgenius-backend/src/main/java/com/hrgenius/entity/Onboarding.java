@@ -15,8 +15,7 @@ import java.time.LocalDate;
 public class Onboarding extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_onboarding_gen")
-    @SequenceGenerator(name = "seq_onboarding_gen", sequenceName = "SEQ_ONBOARDING", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "onboarding_id")
     private Long onboardingId;
 

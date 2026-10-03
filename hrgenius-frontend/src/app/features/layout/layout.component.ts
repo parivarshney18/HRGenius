@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { RoleBadgeComponent } from '../../shared/components/role-badge/role-badge.component';
 
 @Component({
@@ -32,6 +33,7 @@ import { RoleBadgeComponent } from '../../shared/components/role-badge/role-badg
 })
 export class LayoutComponent {
   public readonly authService = inject(AuthService);
+  public readonly themeService = inject(ThemeService);
   public readonly currentUser = this.authService.currentUser;
   public readonly userNavItems = this.authService.userNavItems;
 

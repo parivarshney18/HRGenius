@@ -9,13 +9,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--muted);
 
   .crumb-link {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #0284c7;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
 
@@ -34,12 +34,12 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #94a3b8;
+    color: var(--muted);
   }
 
   .crumb-current {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text);
   }
 }
 
@@ -48,9 +48,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-radius: 14px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
   flex-wrap: wrap;
   gap: 1rem;
 
@@ -60,35 +61,35 @@
     gap: 1.25rem;
 
     .header-icon-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: #ffffff;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
 
       mat-icon {
-        font-size: 28px;
-        width: 28px;
-        height: 28px;
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
       }
     }
 
     .header-titles {
       .page-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #0f172a;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
         margin: 0;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.02em;
       }
 
       .page-subtitle {
         font-size: 0.875rem;
-        color: #64748b;
+        color: var(--muted);
         margin: 0.25rem 0 0;
       }
     }
@@ -96,15 +97,19 @@
 
   .header-right {
     .create-btn {
-      height: 42px;
+      height: 40px;
       border-radius: 8px;
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
+      background: var(--accent-strong);
       color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+      transition: background 150ms ease;
+
+      &:hover {
+        background: var(--accent);
+      }
     }
   }
 }
@@ -117,9 +122,10 @@
   .stat-pill {
     flex: 1;
     min-width: 200px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
     padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
@@ -132,6 +138,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: var(--accent-soft);
+      color: var(--accent);
 
       mat-icon {
         font-size: 22px;
@@ -139,19 +147,9 @@
         height: 22px;
       }
 
-      &.total {
-        background-color: #e0f2fe;
-        color: #0284c7;
-      }
-
-      &.active {
-        background-color: #dcfce7;
-        color: #15803d;
-      }
-
       &.inactive {
-        background-color: #fee2e2;
-        color: #b91c1c;
+        background-color: var(--border);
+        color: var(--muted);
       }
     }
 
@@ -160,15 +158,15 @@
       flex-direction: column;
 
       .stat-num {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: #0f172a;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
         line-height: 1.1;
       }
 
       .stat-label {
         font-size: 0.75rem;
-        color: #64748b;
+        color: var(--muted);
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -184,13 +182,13 @@
   justify-content: center;
   gap: 1rem;
   padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  color: var(--muted);
   font-weight: 500;
 }
 
 .table-card {
-  border-radius: 12px;
+  border-radius: var(--radius);
 }

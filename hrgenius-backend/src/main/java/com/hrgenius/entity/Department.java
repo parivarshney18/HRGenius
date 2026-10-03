@@ -13,8 +13,7 @@ import lombok.*;
 public class Department extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_dept_gen")
-    @SequenceGenerator(name = "seq_dept_gen", sequenceName = "SEQ_DEPARTMENTS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "department_id")
     private Long departmentId;
 

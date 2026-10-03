@@ -11,13 +11,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--muted);
 
   .crumb-link {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #0284c7;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
 
@@ -36,12 +36,12 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #94a3b8;
+    color: var(--muted);
   }
 
   .crumb-current {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text);
   }
 }
 
@@ -51,9 +51,9 @@
   justify-content: center;
   gap: 1rem;
   padding: 3rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  color: #64748b;
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -62,15 +62,15 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem 2rem;
-  border-radius: 12px;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
+  border-radius: var(--radius);
+  background-color: rgba(180, 35, 24, 0.08);
+  border: 1px solid rgba(180, 35, 24, 0.2);
 
   .error-icon {
-    font-size: 36px;
-    width: 36px;
-    height: 36px;
-    color: #dc2626;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--danger);
   }
 
   .error-text {
@@ -78,13 +78,13 @@
 
     h3 {
       margin: 0;
-      color: #991b1b;
+      color: var(--danger);
       font-size: 1.1rem;
     }
 
     p {
       margin: 0.25rem 0 0;
-      color: #b91c1c;
+      color: var(--muted);
       font-size: 0.875rem;
     }
   }
@@ -95,9 +95,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-  border: 1px solid #e0f2fe;
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
   flex-wrap: wrap;
   gap: 1.5rem;
 
@@ -107,17 +108,17 @@
     gap: 1.5rem;
 
     .avatar-box {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: #ffffff;
-      font-size: 1.75rem;
-      font-weight: 800;
+      width: 68px;
+      height: 68px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent-soft-2);
+      font-size: 1.6rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.3);
       flex-shrink: 0;
     }
 
@@ -129,39 +130,40 @@
         flex-wrap: wrap;
 
         .employee-name {
-          font-size: 1.75rem;
-          font-weight: 800;
-          color: #0f172a;
+          font-size: 1.6rem;
+          font-weight: 700;
+          color: var(--text);
           margin: 0;
-          letter-spacing: -0.5px;
+          letter-spacing: -0.02em;
         }
 
         .status-badge {
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
           padding: 3px 10px;
           border-radius: 9999px;
           font-size: 0.75rem;
-          font-weight: 700;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.5px;
 
           &[data-status="Active"] {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #86efac;
+            background-color: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--accent-soft-2);
           }
 
           &[data-status="Inactive"] {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
+            background-color: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
           }
         }
       }
 
       .designation-text {
-        font-size: 1rem;
-        color: #475569;
+        font-size: 0.95rem;
+        color: var(--muted);
         margin: 0.25rem 0 0.75rem;
         font-weight: 500;
       }
@@ -176,29 +178,18 @@
           align-items: center;
           gap: 4px;
           padding: 4px 10px;
-          border-radius: 8px;
+          border-radius: 6px;
           font-size: 0.8rem;
-          font-weight: 600;
+          font-weight: 500;
+          background-color: var(--surface-2);
+          color: var(--text);
+          border: 1px solid var(--border);
 
           mat-icon {
             font-size: 15px;
             width: 15px;
             height: 15px;
-          }
-
-          &.code-tag {
-            background-color: #e2e8f0;
-            color: #334155;
-          }
-
-          &.type-tag {
-            background-color: #ede9fe;
-            color: #6d28d9;
-          }
-
-          &.dept-tag {
-            background-color: #e0f2fe;
-            color: #0284c7;
+            color: var(--accent);
           }
         }
       }
@@ -210,7 +201,7 @@
     gap: 0.75rem;
 
     button {
-      height: 42px;
+      height: 40px;
       border-radius: 8px;
       font-weight: 600;
       display: flex;
@@ -219,17 +210,22 @@
     }
 
     .edit-btn {
-      background-color: #ffffff;
-      color: #0284c7;
-      border-color: #bae6fd;
+      background-color: var(--surface);
+      color: var(--accent);
+      border-color: var(--accent);
 
       &:hover {
-        background-color: #f0f9ff;
+        background-color: var(--accent-soft);
       }
     }
 
     .delete-btn {
-      border-color: #fca5a5;
+      color: var(--danger) !important;
+      border-color: rgba(180, 35, 24, 0.3) !important;
+
+      &:hover {
+        background-color: rgba(180, 35, 24, 0.08);
+      }
     }
   }
 }
@@ -240,27 +236,29 @@
   gap: 1.5rem;
 
   .detail-card {
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    background-color: #ffffff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    box-shadow: var(--shadow);
 
     .card-header {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       padding: 1.25rem;
+      border-bottom: 1px solid var(--border);
 
       .header-icon {
-        color: #0284c7;
-        font-size: 22px;
-        width: 22px;
-        height: 22px;
+        color: var(--accent);
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
       }
 
       .card-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
         margin: 0;
       }
     }
@@ -279,19 +277,19 @@
         .info-label {
           font-size: 0.75rem;
           font-weight: 600;
-          color: #64748b;
+          color: var(--muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
 
         .info-value {
-          font-size: 0.95rem;
-          color: #1e293b;
+          font-size: 0.925rem;
+          color: var(--text);
           font-weight: 500;
 
           &.highlight {
-            font-weight: 700;
-            color: #0284c7;
+            font-weight: 600;
+            color: var(--accent);
           }
 
           .inline-icon {
@@ -300,17 +298,18 @@
             height: 16px;
             vertical-align: middle;
             margin-right: 4px;
-            color: #64748b;
+            color: var(--muted);
           }
 
           .email-link,
           .phone-link {
-            color: #0284c7;
+            color: var(--accent);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
 
             &:hover {
+              color: var(--accent-strong);
               text-decoration: underline;
             }
           }
@@ -324,7 +323,9 @@
           &.code-pill {
             display: inline-block;
             font-family: monospace;
-            background: #f1f5f9;
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
             padding: 2px 8px;
             border-radius: 4px;
             width: fit-content;
@@ -342,10 +343,16 @@
 
   .back-btn {
     border-radius: 8px;
-    height: 42px;
-    font-weight: 600;
+    height: 40px;
+    font-weight: 500;
+    color: var(--muted);
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    &:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+    }
   }
 }

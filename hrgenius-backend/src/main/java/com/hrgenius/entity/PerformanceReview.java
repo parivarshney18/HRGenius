@@ -16,8 +16,7 @@ import java.time.LocalDate;
 public class PerformanceReview extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_perf_gen")
-    @SequenceGenerator(name = "seq_perf_gen", sequenceName = "SEQ_PERFORMANCE_REVIEWS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "performance_id")
     private Long performanceId;
 
@@ -28,19 +27,16 @@ public class PerformanceReview extends BaseAuditEntity {
     @Column(name = "review_period", length = 50, nullable = false)
     private String reviewPeriod; // e.g. 2026-Q1, 2026-Annual
 
-    @Lob
-    @Column(name = "goal", nullable = false)
+    @Column(name = "goal", columnDefinition = "TEXT", nullable = false)
     private String goal;
 
-    @Lob
-    @Column(name = "achievement")
+    @Column(name = "achievement", columnDefinition = "TEXT")
     private String achievement;
 
     @Column(name = "rating")
     private Double rating; // 1.0 to 5.0
 
-    @Lob
-    @Column(name = "feedback")
+    @Column(name = "feedback", columnDefinition = "TEXT")
     private String feedback;
 
     @ManyToOne(fetch = FetchType.LAZY)

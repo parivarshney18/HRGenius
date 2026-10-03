@@ -268,6 +268,7 @@ export class AuthService {
     if (!environment.useMock) {
       return this.http.post<LoginApiResponse>(`${environment.apiUrl}/auth/login`, {
         username: trimmedUser,
+        email: trimmedUser,
         password
       }).pipe(
         map(res => {
@@ -313,11 +314,12 @@ export class AuthService {
 
     // In-memory mock path
     const account = this.mockAccounts.find(
-      acc => acc.user.username.toLowerCase() === trimmedUser.toLowerCase()
+      acc => acc.user.username.toLowerCase() === trimmedUser.toLowerCase() ||
+             (acc.user.email && acc.user.email.toLowerCase() === trimmedUser.toLowerCase())
     );
 
     if (!account) {
-      return of({ success: false, message: 'Invalid username. Try admin, hr, manager, or employee.' });
+      return of({ success: false, message: 'Invalid credentials. Try admin, hr, manager, or employee (or their emails).' });
     }
 
     if (account.passwordHash !== password) {
@@ -340,6 +342,130 @@ export class AuthService {
     this._currentUser.set(account.user);
 
     return of({ success: true });
+  }
+
+  /**
+   * Log in with Google Identity Services ID Token
+   */
+  public loginWithGoogle(idToken: string): Observable<{ success: boolean; message?: string }> {
+    const trimmedToken = idToken.trim();
+
+    if (!environment.useMock) {
+      return this.http.post<LoginApiResponse>(`${environment.apiUrl}/auth/google`, {
+        id_token: trimmedToken
+      }).pipe(
+        map(res => {
+          const token = res.token || res.access_token || '';
+          const role = this.normalizeRole(res.role);
+          const employeeName = res.employee_name || res.username;
+          const employeeId = res.employee_id != null ? Number(res.employee_id) : null;
+
+          const user: User = {
+            id: res.user_id || employeeId || res.username,
+            user_id: res.user_id,
+            username: res.username,
+            name: employeeName,
+            role,
+            email: res.email || `${res.username}@hrgenius.com`,
+            employee_id: employeeId,
+            employee_name: employeeName,
+            token
+          };
+
+          // Store auth data in localStorage exactly like normal login
+          localStorage.setItem('hrgenius_jwt_token', token);
+          localStorage.setItem('token', token);
+          localStorage.setItem('role', role);
+          localStorage.setItem('username', res.username);
+          if (employeeId != null) {
+            localStorage.setItem('employee_id', String(employeeId));
+          }
+          if (employeeName) {
+            localStorage.setItem('employee_name', employeeName);
+          }
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+          this._currentUser.set(user);
+
+          return { success: true };
+        }),
+        catchError(err => {
+          const message = err?.error?.message || 'Google sign-in failed. Please verify your credentials.';
+          return of({ success: false, message });
+        })
+      );
+    }
+
+    // In-memory mock path: match first admin account
+    const account = this.mockAccounts[0];
+    const mockToken = `mock-google-jwt-token-${account.user.username}`;
+    localStorage.setItem('hrgenius_jwt_token', mockToken);
+    localStorage.setItem('token', mockToken);
+    localStorage.setItem('role', account.user.role);
+    localStorage.setItem('username', account.user.username);
+    if (account.user.employee_id != null) {
+      localStorage.setItem('employee_id', String(account.user.employee_id));
+    }
+    if (account.user.employee_name || account.user.name) {
+      localStorage.setItem('employee_name', account.user.employee_name || account.user.name);
+    }
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(account.user));
+    this._currentUser.set(account.user);
+
+    return of({ success: true });
+  }
+
+  /**
+   * Request password reset link
+   */
+  public forgotPassword(email: string): Observable<{ success: boolean; message: string }> {
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!environment.useMock) {
+      return this.http.post<{ success?: boolean; message?: string }>(`${environment.apiUrl}/auth/forgot-password`, {
+        email: trimmedEmail
+      }).pipe(
+        map(res => ({
+          success: true,
+          message: res.message || 'If this email exists, a reset link has been sent'
+        })),
+        catchError(err => {
+          const msg = err?.error?.message || 'If this email exists, a reset link has been sent';
+          return of({ success: false, message: msg });
+        })
+      );
+    }
+
+    // Mock mode
+    return of({
+      success: true,
+      message: 'If this email exists, a reset link has been sent'
+    });
+  }
+
+  /**
+   * Reset password using token and new password
+   */
+  public resetPassword(token: string, newPassword: string): Observable<{ success: boolean; message: string }> {
+    if (!environment.useMock) {
+      return this.http.post<{ success?: boolean; message?: string }>(`${environment.apiUrl}/auth/reset-password`, {
+        token: token.trim(),
+        new_password: newPassword
+      }).pipe(
+        map(res => ({
+          success: true,
+          message: res.message || 'Password has been reset successfully'
+        })),
+        catchError(err => {
+          const msg = err?.error?.message || 'Invalid or expired password reset token';
+          return of({ success: false, message: msg });
+        })
+      );
+    }
+
+    // Mock mode
+    return of({
+      success: true,
+      message: 'Password has been reset successfully'
+    });
   }
 
   /**

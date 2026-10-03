@@ -15,8 +15,7 @@ import java.time.LocalDate;
 public class Job extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_jobs_gen")
-    @SequenceGenerator(name = "seq_jobs_gen", sequenceName = "SEQ_JOBS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "job_id")
     private Long jobId;
 
@@ -27,12 +26,10 @@ public class Job extends BaseAuditEntity {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Lob
-    @Column(name = "requirements")
+    @Column(name = "requirements", columnDefinition = "TEXT")
     private String requirements;
 
     @Column(name = "openings", nullable = false)

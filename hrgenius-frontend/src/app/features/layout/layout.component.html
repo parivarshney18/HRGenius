@@ -1,6 +1,6 @@
 <div class="layout-wrapper">
-  <!-- Top Bar -->
-  <mat-toolbar class="top-bar mat-elevation-z2">
+  <!-- Minimal Top Bar -->
+  <mat-toolbar class="top-bar">
     <button
       mat-icon-button
       (click)="toggleSidenav()"
@@ -10,7 +10,7 @@
       <mat-icon>menu</mat-icon>
     </button>
 
-    <div class="brand-container">
+    <div class="brand-container" routerLink="/dashboard">
       <div class="brand-icon-box">
         <mat-icon class="brand-icon">hub</mat-icon>
       </div>
@@ -19,7 +19,18 @@
 
     <span class="toolbar-spacer"></span>
 
-    <!-- Topbar User Info -->
+    <!-- Theme Toggle (Light / Dark) -->
+    <button
+      mat-icon-button
+      class="theme-toggle-btn"
+      (click)="themeService.toggleTheme()"
+      [matTooltip]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      aria-label="Toggle color theme"
+    >
+      <mat-icon>{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    <!-- Topbar User Profile & Session Action -->
     @if (currentUser(); as user) {
       <div class="user-profile-section">
         <div class="avatar-circle">
@@ -31,14 +42,13 @@
         </div>
 
         <button
-          mat-stroked-button
-          color="warn"
+          mat-button
           class="logout-btn"
           (click)="logout()"
-          matTooltip="End current session"
+          matTooltip="Sign out of HRGenius"
         >
           <mat-icon>logout</mat-icon>
-          <span>Logout</span>
+          <span>Sign Out</span>
         </button>
       </div>
     }
@@ -46,7 +56,7 @@
 
   <!-- Sidenav Container -->
   <mat-sidenav-container class="sidenav-container" autosize>
-    <!-- Sidenav Sidebar -->
+    <!-- Slim Neutral Sidebar -->
     <mat-sidenav
       [opened]="isSidenavOpened()"
       mode="side"
@@ -54,7 +64,7 @@
     >
       <div class="sidebar-header">
         @if (currentUser(); as user) {
-          <div class="sidebar-user-card">
+          <div class="sidebar-user-card" routerLink="/profile">
             <div class="user-avatar-lg">
               {{ user.name.charAt(0) }}
             </div>
@@ -91,7 +101,7 @@
       </mat-nav-list>
 
       <div class="sidebar-footer">
-        <span class="version-label">HRGenius Portal v1.0</span>
+        <span class="version-label">HRGenius Portal • v1.0</span>
       </div>
     </mat-sidenav>
 

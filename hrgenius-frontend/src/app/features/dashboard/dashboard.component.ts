@@ -13,6 +13,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { EmployeeService } from '../../core/services/employee.service';
 import { DepartmentService } from '../../core/services/department.service';
@@ -88,6 +89,8 @@ export function downloadCsv(filename: string, rows: Record<string, any>[]): void
 })
 export class DashboardComponent implements OnInit {
   public readonly authService = inject(AuthService);
+  public readonly themeService = inject(ThemeService);
+  public readonly isDark = computed(() => this.themeService.isDark());
   private readonly dashboardService = inject(DashboardService);
   private readonly employeeService = inject(EmployeeService);
   private readonly departmentService = inject(DepartmentService);
@@ -164,6 +167,12 @@ export class DashboardComponent implements OnInit {
 
   // Chart 1: Department-wise Headcount
   public readonly deptChartData = computed<ChartData<'doughnut', number[], string>>(() => {
+    const isDark = this.isDark();
+    const colors = isDark
+      ? ['#D9788F', '#E592A5', '#BE5670', '#A8435D', '#A8A19B', '#8C857E', '#68625D', '#36312E']
+      : ['#BE5670', '#8C3D52', '#D9788F', '#A8435D', '#68625D', '#8C857E', '#A8A29D', '#D6D3D1'];
+    const borderColor = isDark ? '#221F1E' : '#FFFFFF';
+
     const st = this.stats();
     if (st && st.department_wise_headcount && Object.keys(st.department_wise_headcount).length > 0) {
       return {
@@ -171,9 +180,9 @@ export class DashboardComponent implements OnInit {
         datasets: [
           {
             data: Object.values(st.department_wise_headcount),
-            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#64748b'],
+            backgroundColor: colors,
             borderWidth: 2,
-            borderColor: '#ffffff'
+            borderColor
           }
         ]
       };
@@ -191,24 +200,37 @@ export class DashboardComponent implements OnInit {
       datasets: [
         {
           data: Object.values(counts),
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#64748b'],
+          backgroundColor: colors,
           borderWidth: 2,
-          borderColor: '#ffffff'
+          borderColor
         }
       ]
     };
   });
 
-  public readonly deptChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }
-    }
-  };
+  public readonly deptChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, font: { size: 11, family: 'Inter' }, color: textColor }
+        }
+      }
+    };
+  });
 
   // Chart 2: Attendance Summary
   public readonly attendanceChartData = computed<ChartData<'pie', number[], string>>(() => {
+    const isDark = this.isDark();
+    const colors = isDark
+      ? ['#D9788F', '#E592A5', '#8C857E', '#36312E']
+      : ['#BE5670', '#D9788F', '#8C857E', '#D6D3D1'];
+    const borderColor = isDark ? '#221F1E' : '#FFFFFF';
+
     const st = this.stats();
     if (st && st.attendance_summary) {
       return {
@@ -216,9 +238,9 @@ export class DashboardComponent implements OnInit {
         datasets: [
           {
             data: Object.values(st.attendance_summary),
-            backgroundColor: ['#22c55e', '#f59e0b', '#a855f7', '#ef4444'],
+            backgroundColor: colors,
             borderWidth: 2,
-            borderColor: '#ffffff'
+            borderColor
           }
         ]
       };
@@ -235,24 +257,36 @@ export class DashboardComponent implements OnInit {
       datasets: [
         {
           data: [present, late, halfDay, absent],
-          backgroundColor: ['#22c55e', '#f59e0b', '#a855f7', '#ef4444'],
+          backgroundColor: colors,
           borderWidth: 2,
-          borderColor: '#ffffff'
+          borderColor
         }
       ]
     };
   });
 
-  public readonly attendanceChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }
-    }
-  };
+  public readonly attendanceChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, font: { size: 11, family: 'Inter' }, color: textColor }
+        }
+      }
+    };
+  });
 
   // Chart 3: Leave Summary
   public readonly leaveChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const isDark = this.isDark();
+    const colors = isDark
+      ? ['#D9788F', '#8C857E', '#36312E']
+      : ['#BE5670', '#8C857E', '#D6D3D1'];
+
     const st = this.stats();
     if (st && st.leave_summary) {
       return {
@@ -261,7 +295,7 @@ export class DashboardComponent implements OnInit {
           {
             label: 'Leave Requests',
             data: Object.values(st.leave_summary),
-            backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+            backgroundColor: colors,
             borderRadius: 6
           }
         ]
@@ -279,26 +313,44 @@ export class DashboardComponent implements OnInit {
         {
           label: 'Leave Requests',
           data: [approved, pending, rejected],
-          backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+          backgroundColor: colors,
           borderRadius: 6
         }
       ]
     };
   });
 
-  public readonly leaveChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { stepSize: 1 } }
-    }
-  };
+  public readonly leaveChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    const gridColor = isDark ? '#36312E' : '#E4DFD7';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { color: gridColor }
+        },
+        x: {
+          ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { display: false }
+        }
+      }
+    };
+  });
 
   // Chart 4: Recruitment Funnel
   public readonly recruitmentChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const isDark = this.isDark();
+    const colors = isDark
+      ? ['#D9788F', '#E592A5', '#BE5670', '#8C857E', '#36312E']
+      : ['#BE5670', '#A8435D', '#D9788F', '#8C857E', '#D6D3D1'];
+
     const st = this.stats();
     if (st && st.recruitment_funnel) {
       return {
@@ -307,7 +359,7 @@ export class DashboardComponent implements OnInit {
           {
             label: 'Candidates in Pipeline',
             data: Object.values(st.recruitment_funnel),
-            backgroundColor: ['#38bdf8', '#818cf8', '#fbbf24', '#34d399', '#ef4444'],
+            backgroundColor: colors,
             borderRadius: 6
           }
         ]
@@ -326,27 +378,44 @@ export class DashboardComponent implements OnInit {
         {
           label: 'Candidates in Pipeline',
           data: [applied, shortlisted, interviewed, selected],
-          backgroundColor: ['#38bdf8', '#818cf8', '#fbbf24', '#34d399'],
+          backgroundColor: colors,
           borderRadius: 6
         }
       ]
     };
   });
 
-  public readonly recruitmentChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    indexAxis: 'y',
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      x: { beginAtZero: true, ticks: { stepSize: 1 } }
-    }
-  };
+  public readonly recruitmentChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    const gridColor = isDark ? '#36312E' : '#E4DFD7';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { color: gridColor }
+        },
+        y: {
+          ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { display: false }
+        }
+      }
+    };
+  });
 
   // Chart 5: Payroll Summary (Gross vs Net)
   public readonly payrollChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const isDark = this.isDark();
+    const grossColor = isDark ? '#8C857E' : '#68625D';
+    const netColor = isDark ? '#D9788F' : '#BE5670';
+
     const st = this.stats();
     if (st && Array.isArray(st.payroll_summary) && st.payroll_summary.length > 0) {
       return {
@@ -355,13 +424,13 @@ export class DashboardComponent implements OnInit {
           {
             label: 'Gross Outlay ($)',
             data: st.payroll_summary.map((p: any) => Number(p.gross_salary) || 0),
-            backgroundColor: '#3b82f6',
+            backgroundColor: grossColor,
             borderRadius: 6
           },
           {
             label: 'Net Payout ($)',
             data: st.payroll_summary.map((p: any) => Number(p.net_salary) || 0),
-            backgroundColor: '#10b981',
+            backgroundColor: netColor,
             borderRadius: 6
           }
         ]
@@ -380,37 +449,57 @@ export class DashboardComponent implements OnInit {
         {
           label: 'Gross Outlay ($)',
           data: [augGross, sepGross],
-          backgroundColor: '#3b82f6',
+          backgroundColor: grossColor,
           borderRadius: 6
         },
         {
           label: 'Net Payout ($)',
           data: [augNet, sepNet],
-          backgroundColor: '#10b981',
+          backgroundColor: netColor,
           borderRadius: 6
         }
       ]
     };
   });
 
-  public readonly payrollChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 12 } }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value) => `$${Number(value) / 1000}k`
+  public readonly payrollChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    const gridColor = isDark ? '#36312E' : '#E4DFD7';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, font: { family: 'Inter', size: 11 }, color: textColor }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: (value) => `$${Number(value) / 1000}k`,
+            color: textColor,
+            font: { family: 'Inter', size: 11 }
+          },
+          grid: { color: gridColor }
+        },
+        x: {
+          ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { display: false }
         }
       }
-    }
-  };
+    };
+  });
 
   // Chart 6: Performance Rating Distribution
   public readonly performanceChartData = computed<ChartData<'bar', number[], string>>(() => {
+    const isDark = this.isDark();
+    const colors = isDark
+      ? ['#D9788F', '#E592A5', '#BE5670', '#8C857E', '#36312E']
+      : ['#BE5670', '#A8435D', '#D9788F', '#8C857E', '#D6D3D1'];
+
     const st = this.stats();
     if (st && st.rating_distribution) {
       return {
@@ -419,7 +508,7 @@ export class DashboardComponent implements OnInit {
           {
             label: 'Appraisal Ratings',
             data: Object.values(st.rating_distribution),
-            backgroundColor: ['#eab308', '#f59e0b', '#fb923c', '#f87171', '#ef4444'],
+            backgroundColor: colors,
             borderRadius: 6
           }
         ]
@@ -439,23 +528,36 @@ export class DashboardComponent implements OnInit {
         {
           label: 'Appraisal Ratings',
           data: [star5, star4, star3, star2, star1],
-          backgroundColor: ['#eab308', '#f59e0b', '#fb923c', '#f87171', '#ef4444'],
+          backgroundColor: colors,
           borderRadius: 6
         }
       ]
     };
   });
 
-  public readonly performanceChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      y: { beginAtZero: true, ticks: { stepSize: 1 } }
-    }
-  };
+  public readonly performanceChartOptions = computed<ChartConfiguration['options']>(() => {
+    const isDark = this.isDark();
+    const textColor = isDark ? '#A8A19B' : '#68625D';
+    const gridColor = isDark ? '#36312E' : '#E4DFD7';
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { color: gridColor }
+        },
+        x: {
+          ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+          grid: { display: false }
+        }
+      }
+    };
+  });
 
   ngOnInit(): void {
     this.loadAllData();

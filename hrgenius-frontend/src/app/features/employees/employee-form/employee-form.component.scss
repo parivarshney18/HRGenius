@@ -11,13 +11,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--muted);
 
   .crumb-link {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #0284c7;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
 
@@ -36,20 +36,21 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #94a3b8;
+    color: var(--muted);
   }
 
   .crumb-current {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text);
   }
 }
 
 .form-header-card {
   padding: 1.5rem 2rem;
-  border-radius: 14px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 
   .header-main {
     display: flex;
@@ -57,35 +58,35 @@
     gap: 1.25rem;
 
     .header-icon-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: #ffffff;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
 
       mat-icon {
-        font-size: 28px;
-        width: 28px;
-        height: 28px;
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
       }
     }
 
     .header-text {
       .header-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #0f172a;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
         margin: 0;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.02em;
       }
 
       .header-subtitle {
         font-size: 0.875rem;
-        color: #64748b;
+        color: var(--muted);
         margin: 0.25rem 0 0;
       }
     }
@@ -98,9 +99,9 @@
   justify-content: center;
   gap: 1rem;
   padding: 3rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  color: #64748b;
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -110,10 +111,11 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: rgba(180, 35, 24, 0.08);
+  color: var(--danger);
   font-size: 0.875rem;
-  border-left: 4px solid #ef4444;
+  border: 1px solid rgba(180, 35, 24, 0.2);
+  border-left: 4px solid var(--danger);
 
   mat-icon {
     font-size: 20px;
@@ -129,9 +131,10 @@
 }
 
 .form-section-card {
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  background-color: #ffffff;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  box-shadow: var(--shadow);
   padding: 0.5rem;
 
   .section-card-header {
@@ -141,18 +144,18 @@
     padding: 1rem 1.25rem 0.5rem;
 
     .section-icon {
-      color: #0284c7;
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      color: var(--accent);
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
       margin-top: 2px;
     }
 
     .section-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0f172a;
-      letter-spacing: -0.3px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
   }
 
@@ -187,22 +190,32 @@
   padding: 1rem 0;
 
   .cancel-btn {
-    height: 44px;
+    height: 40px;
     padding: 0 1.5rem;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 500;
+    color: var(--muted);
+
+    &:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+    }
   }
 
   .submit-btn {
-    height: 44px;
+    height: 40px;
     padding: 0 1.75rem;
     border-radius: 8px;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, #0284c7, #2563eb);
+    background: var(--accent-strong);
     color: #ffffff;
-    box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+    transition: background 150ms ease;
+
+    &:hover {
+      background: var(--accent);
+    }
   }
 }

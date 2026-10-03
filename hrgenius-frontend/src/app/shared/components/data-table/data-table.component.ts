@@ -100,14 +100,54 @@ export class DataTableComponent<T = any> implements AfterViewInit, OnChanges {
     return (row as any)[col.key];
   }
 
+  public getBadgeIcon(value: any): string {
+    if (!value) return '';
+    const str = String(value).toUpperCase();
+    if (['ACTIVE', 'APPROVED', 'PRESENT', 'PROCESSED', 'SELECTED', 'PAID', 'COMPLETED', 'PASSED', 'VERIFIED'].includes(str)) {
+      return 'check_circle';
+    }
+    if (['PENDING', 'DRAFT', 'SHORTLISTED', 'APPLIED', 'IN_PROGRESS', 'IN PROGRESS', 'SUBMITTED', 'OPEN', 'SCREENED'].includes(str)) {
+      return 'schedule';
+    }
+    if (['INACTIVE', 'REJECTED', 'ABSENT', 'CANCELLED', 'TERMINATED', 'CLOSED', 'FAILED'].includes(str)) {
+      return 'cancel';
+    }
+    if (['LATE', 'ON_HOLD', 'WARNING'].includes(str)) {
+      return 'warning';
+    }
+    if (['HALF-DAY', 'HALF_DAY', 'ON_LEAVE'].includes(str)) {
+      return 'timelapse';
+    }
+    return 'label';
+  }
+
   public getBadgeStyle(value: any, col: TableColumn<T>): BadgeStyle {
-    if (col.badgeConfig && col.badgeConfig[value]) {
-      return col.badgeConfig[value];
+    const str = String(value || '').toUpperCase();
+    if (['ACTIVE', 'APPROVED', 'PRESENT', 'PROCESSED', 'SELECTED', 'PAID', 'COMPLETED', 'PASSED', 'VERIFIED'].includes(str)) {
+      return {
+        bg: 'var(--accent-soft-2)',
+        color: 'var(--accent-strong)',
+        border: 'var(--accent-soft-2)'
+      };
+    }
+    if (['PENDING', 'DRAFT', 'SHORTLISTED', 'APPLIED', 'IN_PROGRESS', 'IN PROGRESS', 'SUBMITTED', 'OPEN', 'SCREENED'].includes(str)) {
+      return {
+        bg: 'transparent',
+        color: 'var(--text)',
+        border: 'var(--border)'
+      };
+    }
+    if (['INACTIVE', 'REJECTED', 'ABSENT', 'CANCELLED', 'TERMINATED', 'CLOSED', 'FAILED'].includes(str)) {
+      return {
+        bg: 'var(--surface-2)',
+        color: 'var(--muted)',
+        border: 'var(--border-subtle)'
+      };
     }
     return {
-      bg: '#f1f5f9',
-      color: '#475569',
-      border: '#cbd5e1'
+      bg: 'var(--surface-2)',
+      color: 'var(--text)',
+      border: 'var(--border)'
     };
   }
 

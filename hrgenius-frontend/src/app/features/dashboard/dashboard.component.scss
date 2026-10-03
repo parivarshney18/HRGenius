@@ -1,7 +1,7 @@
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   padding: 24px 32px 48px;
   max-width: 1440px;
   margin: 0 auto;
@@ -9,12 +9,12 @@
 
   @media (max-width: 768px) {
     padding: 16px;
-    gap: 20px;
+    gap: 16px;
   }
 }
 
 /* ==========================================================================
-   Welcome Banner
+   Welcome Banner - Calm, minimal surface
    ========================================================================== */
 .welcome-banner {
   display: flex;
@@ -22,11 +22,17 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 24px 28px;
-  color: #ffffff;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.15);
+  box-shadow: var(--shadow);
+
+  .banner-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 
   .greeting-row {
     display: flex;
@@ -36,19 +42,20 @@
   }
 
   .welcome-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     margin: 0;
-    color: #f8fafc;
+    color: var(--text);
+    letter-spacing: -0.02em;
   }
 
   .welcome-subtitle {
-    margin: 6px 0 0;
+    margin: 0;
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--muted);
 
     .live-date {
-      color: #38bdf8;
+      color: var(--accent);
       font-weight: 500;
     }
   }
@@ -59,9 +66,15 @@
     align-items: center;
 
     .refresh-btn {
-      color: #ffffff;
-      border-color: #475569;
+      color: var(--text);
+      border-color: var(--border);
       border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+
+      &:hover {
+        background: var(--accent-soft);
+      }
 
       mat-icon.spin {
         animation: spin 1s linear infinite;
@@ -71,7 +84,13 @@
     .quick-nav-btn {
       border-radius: 8px;
       font-weight: 600;
-      background: #2563eb;
+      font-size: 13px;
+      background: var(--accent-strong);
+      color: #ffffff;
+
+      &:hover {
+        background: var(--accent);
+      }
     }
   }
 }
@@ -82,12 +101,12 @@
 }
 
 /* ==========================================================================
-   4 Mandatory KPI Cards
+   4 KPI Cards - Generous whitespace, 12px radius, soft shadow, thin borders
    ========================================================================== */
 .kpi-cards-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 16px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -98,33 +117,36 @@
   }
 
   .kpi-card {
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 20px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow);
+    transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+      border-color: var(--accent-soft-2);
     }
 
     .kpi-icon-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      flex-shrink: 0;
 
       mat-icon {
-        font-size: 28px;
-        width: 28px;
-        height: 28px;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -134,16 +156,17 @@
 
       .kpi-label {
         font-size: 13px;
-        font-weight: 600;
-        color: #64748b;
+        font-weight: 500;
+        color: var(--muted);
       }
 
       .kpi-value {
-        font-size: 28px;
-        font-weight: 800;
-        color: #0f172a;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
         margin: 2px 0 4px;
-        line-height: 1;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
       }
 
       .kpi-trend {
@@ -152,65 +175,46 @@
         align-items: center;
         gap: 4px;
         font-weight: 500;
+        color: var(--muted);
 
         mat-icon {
-          font-size: 16px;
-          width: 16px;
-          height: 16px;
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+          color: var(--accent);
         }
-
-        &.positive { color: #16a34a; }
-        &.info { color: #0284c7; }
-        &.accent { color: #7c3aed; }
-        &.warning { color: #d97706; }
       }
-    }
-
-    &.total-emp {
-      border-left: 4px solid #3b82f6;
-      .kpi-icon-box { background: #eff6ff; color: #2563eb; }
-    }
-
-    &.new-hires {
-      border-left: 4px solid #10b981;
-      .kpi-icon-box { background: #ecfdf5; color: #059669; }
-    }
-
-    &.open-jobs {
-      border-left: 4px solid #8b5cf6;
-      .kpi-icon-box { background: #f5f3ff; color: #7c3aed; }
-    }
-
-    &.pending-leaves {
-      border-left: 4px solid #f59e0b;
-      .kpi-icon-box { background: #fffbeb; color: #d97706; }
     }
   }
 }
 
 /* ==========================================================================
-   Role Highlights
+   Role Highlights Section
    ========================================================================== */
 .role-highlights-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 
   .section-title-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #1e293b;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
 
     mat-icon {
-      color: #2563eb;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
     }
 
     h3 {
       margin: 0;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 600;
     }
   }
 
@@ -224,46 +228,58 @@
     }
 
     .highlight-tile {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: var(--shadow);
 
       .tile-title {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
         text-transform: uppercase;
-        color: #64748b;
-        letter-spacing: 0.5px;
+        color: var(--muted);
+        letter-spacing: 0.05em;
       }
 
       .tile-content {
-        font-size: 14px;
-        color: #1e293b;
+        font-size: 13px;
+        color: var(--text);
         font-weight: 500;
 
-        .punch-active { color: #16a34a; font-weight: 600; }
-        .punch-inactive { color: #94a3b8; font-style: italic; }
+        .punch-active {
+          color: var(--accent);
+          font-weight: 600;
+        }
+
+        .punch-inactive {
+          color: var(--muted);
+          font-style: italic;
+        }
       }
 
       .tile-link {
-        font-size: 13px;
-        color: #2563eb;
+        font-size: 12px;
+        color: var(--accent);
         font-weight: 600;
         text-decoration: none;
         margin-top: 4px;
+        transition: color 150ms ease;
 
-        &:hover { text-decoration: underline; }
+        &:hover {
+          color: var(--accent-strong);
+          text-decoration: underline;
+        }
       }
     }
   }
 }
 
 /* ==========================================================================
-   6 Chart.js Visualizations Grid
+   Visual Analytics Charts Grid
    ========================================================================== */
 .charts-section {
   display: flex;
@@ -274,24 +290,29 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #1e293b;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
 
     mat-icon {
-      color: #0284c7;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
     }
 
     h3 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
   }
 
   .charts-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 16px;
 
     @media (max-width: 1200px) {
       grid-template-columns: repeat(2, 1fr);
@@ -302,14 +323,14 @@
     }
 
     .chart-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      box-shadow: var(--shadow);
 
       .chart-header {
         display: flex;
@@ -317,19 +338,20 @@
         gap: 12px;
 
         .chart-icon-box {
-          width: 38px;
-          height: 38px;
+          width: 36px;
+          height: 36px;
           border-radius: 8px;
-          background: #f1f5f9;
-          color: #2563eb;
+          background: var(--accent-soft);
+          color: var(--accent);
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
 
           mat-icon {
-            font-size: 20px;
-            width: 20px;
-            height: 20px;
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
           }
         }
 
@@ -339,21 +361,21 @@
 
           h4 {
             margin: 0;
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
           }
 
           span {
             font-size: 12px;
-            color: #64748b;
+            color: var(--muted);
           }
         }
       }
 
       .chart-canvas-wrapper {
         position: relative;
-        height: 240px;
+        height: 220px;
         width: 100%;
       }
     }
@@ -364,65 +386,79 @@
    Reports & CSV Export Hub
    ========================================================================== */
 .reports-export-card {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border: 1px solid #cbd5e1;
-  border-radius: 16px;
-  padding: 24px 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-shadow: var(--shadow);
 
   .reports-header {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 
     .reports-icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: #0284c7;
-      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
     }
 
     .reports-title {
       margin: 0;
-      font-size: 18px;
-      font-weight: 700;
-      color: #0f172a;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
     }
 
     .reports-subtitle {
       margin: 4px 0 0;
       font-size: 13px;
-      color: #64748b;
+      color: var(--muted);
     }
   }
 
   .export-buttons-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
 
     .export-btn {
       border-radius: 8px;
-      background: #ffffff;
-      color: #334155;
-      font-weight: 600;
-      border: 1px solid #cbd5e1;
-      height: 42px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 500;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      height: 38px;
+      transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 
       &:hover {
-        background: #f1f5f9;
-        border-color: #94a3b8;
-        color: #0284c7;
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
       }
 
       mat-icon {
-        color: #0284c7;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: var(--accent);
+        margin-right: 6px;
       }
     }
   }

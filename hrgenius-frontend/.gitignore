@@ -47,3 +47,6 @@ target/
 node_modules/
 .angular/
 dist/
+.vscode/
+.env
+target/

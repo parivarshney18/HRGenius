@@ -16,8 +16,7 @@ import java.time.LocalDate;
 public class LeaveRequest extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_leave_gen")
-    @SequenceGenerator(name = "seq_leave_gen", sequenceName = "SEQ_LEAVE_REQUESTS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "leave_id")
     private Long leaveId;
 

@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 public class Candidate extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_candidates_gen")
-    @SequenceGenerator(name = "seq_candidates_gen", sequenceName = "SEQ_CANDIDATES", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "candidate_id")
     private Long candidateId;
 

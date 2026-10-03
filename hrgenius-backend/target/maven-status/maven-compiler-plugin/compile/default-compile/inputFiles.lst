@@ -22,8 +22,11 @@ C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgen
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\attendance\AttendanceDto.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\attendance\ClockInRequest.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\ChangePasswordRequest.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\ForgotPasswordRequest.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\GoogleLoginRequest.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\JwtAuthResponse.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\LoginRequest.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\ResetPasswordRequest.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\auth\UserDto.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\common\ApiResponse.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\dto\common\ErrorDetails.java
@@ -50,6 +53,7 @@ C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgen
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\Job.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\LeaveRequest.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\Onboarding.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\PasswordResetToken.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\Payroll.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\PerformanceReview.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\entity\Role.java
@@ -68,6 +72,7 @@ C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgen
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\JobRepository.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\LeaveRequestRepository.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\OnboardingRepository.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\PasswordResetTokenRepository.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\PayrollRepository.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\PerformanceReviewRepository.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\repository\RoleRepository.java
@@ -83,6 +88,7 @@ C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgen
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\AuthService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\DashboardService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\DepartmentService.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\EmailService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\EmployeeService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\impl\AnalyticsServiceImpl.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\impl\AttendanceServiceImpl.java
@@ -104,5 +110,6 @@ C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgen
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\PdfReportService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\PerformanceService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\ProfileService.java
+C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\RateLimiterService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\RecruitmentService.java
 C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend\src\main\java\com\hrgenius\service\UserService.java

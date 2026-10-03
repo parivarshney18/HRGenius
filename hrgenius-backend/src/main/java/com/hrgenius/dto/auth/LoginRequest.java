@@ -11,8 +11,10 @@ import lombok.*;
 @Builder
 public class LoginRequest {
 
-    @JsonAlias({"username", "email", "username_or_email"})
+    @JsonAlias({"username", "email", "username_or_email", "email_or_username", "emailOrUsername"})
     private String username;
+
+    private String email;
 
     private String usernameOrEmail;
 
@@ -21,8 +23,14 @@ public class LoginRequest {
 
     public String getUsernameOrEmail() {
         if (username != null && !username.isBlank()) {
-            return username;
+            return username.trim();
         }
-        return usernameOrEmail;
+        if (email != null && !email.isBlank()) {
+            return email.trim();
+        }
+        if (usernameOrEmail != null && !usernameOrEmail.isBlank()) {
+            return usernameOrEmail.trim();
+        }
+        return null;
     }
 }

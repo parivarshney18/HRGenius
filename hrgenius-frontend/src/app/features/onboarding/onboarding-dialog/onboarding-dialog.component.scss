@@ -2,6 +2,8 @@
   padding: 1.5rem;
   max-width: 680px;
   width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius);
 }
 
 .dialog-header {
@@ -11,28 +13,28 @@
   margin-bottom: 1rem;
 
   .header-icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #0284c7, #2563eb);
-    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
     mat-icon {
-      font-size: 26px;
-      width: 26px;
-      height: 26px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
   }
 
   .header-title-box {
     .dialog-title {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--text);
       margin: 0;
       padding: 0;
       line-height: 1.2;
@@ -40,7 +42,7 @@
 
     .dialog-subtitle {
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--muted);
       margin: 0.25rem 0 0;
     }
   }
@@ -50,9 +52,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   padding: 0.75rem 1rem;
   margin-bottom: 1.25rem;
   flex-wrap: wrap;
@@ -65,8 +67,8 @@
 
     .lbl {
       font-size: 0.7rem;
-      font-weight: 700;
-      color: #64748b;
+      font-weight: 600;
+      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -74,11 +76,12 @@
     .val {
       font-size: 0.85rem;
       font-weight: 600;
-      color: #0f172a;
+      color: var(--text);
 
       &.status-pill-selected {
-        color: #15803d;
-        background: #dcfce7;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid var(--accent-soft-2);
         padding: 2px 8px;
         border-radius: 4px;
         width: fit-content;
@@ -87,7 +90,7 @@
       &.code-text {
         font-family: monospace;
         font-size: 0.8rem;
-        color: #0284c7;
+        color: var(--accent);
       }
     }
   }
@@ -104,11 +107,12 @@
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-radius: 8px;
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: rgba(180, 35, 24, 0.08);
+    color: var(--danger);
     font-size: 0.85rem;
     margin-bottom: 1rem;
-    border-left: 4px solid #ef4444;
+    border: 1px solid rgba(180, 35, 24, 0.2);
+    border-left: 4px solid var(--danger);
 
     mat-icon {
       font-size: 18px;
@@ -143,7 +147,7 @@
   gap: 0.75rem;
 
   button {
-    height: 42px;
+    height: 40px;
     border-radius: 8px;
     font-weight: 600;
     display: flex;
@@ -152,8 +156,11 @@
   }
 
   .complete-btn {
-    background: linear-gradient(135deg, #0284c7, #2563eb);
+    background: var(--accent-strong);
     color: #ffffff;
-    box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+
+    &:hover {
+      background: var(--accent);
+    }
   }
 }

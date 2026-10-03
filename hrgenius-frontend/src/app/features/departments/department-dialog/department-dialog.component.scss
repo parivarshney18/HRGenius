@@ -2,6 +2,8 @@
   padding: 1.5rem;
   max-width: 540px;
   width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius);
 }
 
 .dialog-header {
@@ -11,28 +13,28 @@
   margin-bottom: 1.25rem;
 
   .header-icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #0284c7, #2563eb);
-    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
     mat-icon {
-      font-size: 26px;
-      width: 26px;
-      height: 26px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
   }
 
   .header-title-box {
     .dialog-title {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--text);
       margin: 0;
       padding: 0;
       line-height: 1.2;
@@ -40,7 +42,7 @@
 
     .dialog-subtitle {
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--muted);
       margin: 0.25rem 0 0;
     }
   }
@@ -57,11 +59,12 @@
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-radius: 8px;
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: rgba(180, 35, 24, 0.08);
+    color: var(--danger);
     font-size: 0.85rem;
     margin-bottom: 1rem;
-    border-left: 4px solid #ef4444;
+    border: 1px solid rgba(180, 35, 24, 0.2);
+    border-left: 4px solid var(--danger);
 
     mat-icon {
       font-size: 18px;
@@ -95,5 +98,11 @@
     height: 40px;
     border-radius: 8px;
     font-weight: 600;
+    background: var(--accent-strong);
+    color: #ffffff;
+
+    &:hover {
+      background: var(--accent);
+    }
   }
 }

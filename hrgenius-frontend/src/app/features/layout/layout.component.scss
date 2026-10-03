@@ -3,50 +3,63 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  background-color: var(--bg);
 }
 
+/* --------------------------------------------------------------------------
+   Minimal Top Bar
+   -------------------------------------------------------------------------- */
 .top-bar {
   display: flex;
   align-items: center;
-  height: 64px;
-  background-color: #ffffff;
-  color: #0f172a;
-  border-bottom: 1px solid #e2e8f0;
+  height: 56px;
+  background-color: var(--surface) !important;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
   padding: 0 1rem;
-  z-index: 10;
+  z-index: 20;
+  box-shadow: none;
 
   .menu-toggle-btn {
     margin-right: 0.5rem;
-    color: #475569;
+    color: var(--muted);
+
+    &:hover {
+      color: var(--text);
+      background-color: var(--surface-2);
+    }
   }
 
   .brand-container {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.65rem;
+    cursor: pointer;
+    user-select: none;
 
     .brand-icon-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background-color: var(--accent-strong);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background-color 150ms ease;
 
       .brand-icon {
         color: #ffffff;
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
     }
 
     .brand-text {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #0f172a;
-      letter-spacing: -0.5px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
     }
   }
 
@@ -54,22 +67,33 @@
     flex: 1 1 auto;
   }
 
+  .theme-toggle-btn {
+    margin-right: 0.75rem;
+    color: var(--muted);
+
+    &:hover {
+      color: var(--accent);
+      background-color: var(--surface-2);
+    }
+  }
+
   .user-profile-section {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.75rem;
 
     .avatar-circle {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 1rem;
+      background-color: var(--accent-soft-2);
+      color: var(--accent-strong);
+      font-weight: 600;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid var(--border);
     }
 
     .user-meta {
@@ -79,64 +103,80 @@
       gap: 2px;
 
       .user-name {
-        font-size: 0.875rem;
+        font-size: 0.825rem;
         font-weight: 600;
-        color: #1e293b;
+        color: var(--text);
       }
     }
 
     .logout-btn {
-      margin-left: 0.5rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 0 12px;
-      height: 36px;
+      margin-left: 0.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      height: 32px;
+      padding: 0 10px;
 
       mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+
+      &:hover {
+        color: var(--danger);
+        background-color: var(--danger-soft);
       }
     }
   }
 }
 
+/* --------------------------------------------------------------------------
+   Sidenav Container & Slim Sidebar
+   -------------------------------------------------------------------------- */
 .sidenav-container {
   flex: 1;
-  height: calc(100vh - 64px);
-  background-color: #f8fafc;
+  height: calc(100vh - 56px);
+  background-color: var(--bg);
 }
 
 .sidebar-nav {
-  width: 270px;
-  background-color: #ffffff;
-  border-right: 1px solid #e2e8f0;
+  width: 240px;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 
   .sidebar-header {
-    padding: 1.25rem 1rem;
+    padding: 1rem 0.85rem;
 
     .sidebar-user-card {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color 150ms ease;
+
+      &:hover {
+        background-color: var(--surface-2);
+      }
 
       .user-avatar-lg {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #0284c7, #2563eb);
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 1.2rem;
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        background-color: var(--accent-soft-2);
+        color: var(--accent-strong);
+        font-weight: 600;
+        font-size: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
+        border: 1px solid var(--border);
       }
 
       .user-details {
@@ -145,101 +185,107 @@
         overflow: hidden;
 
         .name {
-          font-weight: 700;
-          font-size: 0.95rem;
-          color: #0f172a;
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--text);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .dept {
-          font-size: 0.75rem;
-          color: #64748b;
+          font-size: 0.72rem;
+          color: var(--muted);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .badge-wrapper {
-          margin-top: 4px;
+          margin-top: 3px;
         }
       }
     }
   }
 
   .sidebar-menu-title {
-    padding: 1rem 1rem 0.5rem;
+    padding: 0.85rem 1rem 0.35rem;
 
     span {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 0.75px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
   }
 
   .nav-list {
-    padding: 0.5rem;
+    padding: 0.35rem 0.5rem;
     flex: 1;
 
     .nav-item-link {
-      border-radius: 8px;
-      margin-bottom: 4px;
-      color: #475569;
-      transition: all 0.15s ease;
+      border-radius: var(--radius-sm);
+      margin-bottom: 2px;
+      color: var(--text);
+      height: 40px;
+      transition: all 150ms ease;
 
       .nav-icon {
-        color: #64748b;
-        margin-right: 0.75rem;
-        transition: color 0.15s ease;
+        color: var(--muted);
+        margin-right: 0.65rem;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        transition: color 150ms ease;
       }
 
       .nav-title {
         font-weight: 500;
-        font-size: 0.875rem;
+        font-size: 0.825rem;
       }
 
       &:hover {
-        background-color: #f1f5f9;
-        color: #0f172a;
+        background-color: var(--surface-2);
+        color: var(--text);
 
         .nav-icon {
-          color: #0284c7;
+          color: var(--accent);
         }
       }
 
       &.active-nav-link {
-        background-color: #e0f2fe;
-        color: #0369a1;
+        background-color: var(--accent-soft-2);
+        color: var(--accent-strong);
         font-weight: 600;
+        border-left: 3px solid var(--accent);
 
         .nav-icon {
-          color: #0284c7;
+          color: var(--accent-strong);
         }
       }
     }
   }
 
   .sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #f1f5f9;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
     text-align: center;
 
     .version-label {
-      font-size: 0.75rem;
-      color: #94a3b8;
+      font-size: 0.7rem;
+      color: var(--muted);
     }
   }
 }
 
 .main-content-area {
-  background-color: #f8fafc;
+  background-color: var(--bg);
   overflow-y: auto;
 }
 
 .content-viewport {
   padding: 1.5rem;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
 }

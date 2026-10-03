@@ -18,8 +18,7 @@ import java.time.LocalDate;
 public class Payroll extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_payroll_gen")
-    @SequenceGenerator(name = "seq_payroll_gen", sequenceName = "SEQ_PAYROLL", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payroll_id")
     private Long payrollId;
 

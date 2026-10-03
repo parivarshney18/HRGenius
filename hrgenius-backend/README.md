@@ -11,8 +11,8 @@ Production-ready Spring Boot 3 REST API backend powering the **HRGenius** Human 
 - **Security**: Spring Security 6 with stateless JWT Bearer tokens and BCrypt password encryption
 - **Data Persistence**: Spring Data JPA, Hibernate ORM
 - **Databases**:
-  - **H2 Database** (Default Profile): In-memory database with automatic startup seeding and web console
-  - **Oracle Database** (`oracle` Profile): Production enterprise profile utilizing Oracle `ojdbc11` driver with environment variable injection (`DB_URL`, `DB_USER`, `DB_PASSWORD`)
+  - **MySQL 8.0+** (Default Profile): Enterprise relational database using `mysql-connector-j` driver, auto DDL update, and environment variable configuration (`DB_USER`, `DB_PASSWORD`, and optional `DB_URL`)
+  - **H2 Database** (`h2` Profile): In-memory database with web console for lightweight testing without MySQL
 - **Documentation**: SpringDoc OpenAPI 3 / Swagger UI (`http://localhost:8080/swagger-ui.html`)
 - **JSON Serialization**: Jackson with global `SNAKE_CASE` property naming strategy matching Angular frontend models
 - **Utilities**: Project Lombok, Jakarta Validation API, Apache Commons, OpenPDF
@@ -23,38 +23,100 @@ Production-ready Spring Boot 3 REST API backend powering the **HRGenius** Human 
 
 ### Prerequisites
 - JDK 17 or higher installed (`java -version`)
+- MySQL 8.0+ running on `localhost:3306` with database `hrgenius`
 - Maven Wrapper is included in the project directory (`mvnw.cmd` on Windows, `./mvnw` on Linux/macOS)
 
-### 1. Run with Default H2 In-Memory Profile
-```bash
-# Navigate to backend directory
-cd C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend
+### 1. MySQL Setup (Default Profile)
+1. Ensure the `hrgenius` database exists in MySQL:
+   ```sql
+   CREATE DATABASE IF NOT EXISTS hrgenius DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+2. Set the environment variables for your MySQL credentials:
+   - **Windows (PowerShell):**
+     ```powershell
+     $env:DB_USER = "root"
+     $env:DB_PASSWORD = "your_mysql_password"
+     ```
+   - **Windows (CMD):**
+     ```cmd
+     set DB_USER=root
+     set DB_PASSWORD=your_mysql_password
+     ```
+   - **Linux / macOS (Bash/Zsh):**
+     ```bash
+     export DB_USER=root
+     export DB_PASSWORD=your_mysql_password
+     ```
+3. Start the backend:
+   ```powershell
+   cd C:\Users\Asus\OneDrive\Desktop\HRGenius\hrgenius-backend
+   .\mvnw.cmd spring-boot:run
+   ```
+4. The server will start on port **8080**.
+   - Hibernate automatically applies schema updates (`spring.jpa.hibernate.ddl-auto=update`).
+   - The DDL reference schema is also available at [`database/schema.sql`](file:///C:/Users/Asus/OneDrive/Desktop/HRGenius/hrgenius-backend/database/schema.sql).
+   - `DatabaseSeeder` automatically populates realistic demo records (8 departments, 70 employees, 70 users, 55 jobs, 75 candidates, 50 onboarding cases, 80 attendance records, 65 leaves, 75 payroll entries, and 60 performance reviews) on the first start, and safely skips execution if data is already present.
 
-# Windows
-.\mvnw.cmd spring-boot:run
-
-# Linux / macOS
-./mvnw spring-boot:run
+### 2. Optional: Run with H2 In-Memory Profile
+If you wish to test without a running MySQL instance:
+```powershell
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=h2
 ```
-The server will start on port **8080**. All demo data (8 departments, 15 employees, 4 accounts, jobs, candidates, attendance, leaves, payroll, and appraisals) seeds automatically on startup.
-
-### 2. Run with Oracle Database Profile
-Set the required environment variables and activate the `oracle` Spring profile:
-```bash
-# Set environment variables
-set DB_URL=jdbc:oracle:thin:@//localhost:1521/XEPDB1
-set DB_USER=hrgenius
-set DB_PASSWORD=your_password
-
-# Run with oracle profile
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=oracle
-```
+H2 console will be accessible at `http://localhost:8080/h2-console` (`jdbc:h2:mem:hrgeniusdb`).
 
 ### 3. Build Executable JAR
-```bash
+```powershell
 .\mvnw.cmd clean package -DskipTests
 java -jar target/hrgenius-backend-1.0.0-SNAPSHOT.jar
 ```
+
+### 4. Build and Run with Docker
+From the backend directory, build and run the image locally with the H2 profile:
+```powershell
+docker build -t hrgenius-backend .
+docker run --rm -p 8080:8080 -e PORT=8080 -e SPRING_PROFILES_ACTIVE=h2 hrgenius-backend
+```
+The API will be available at `http://localhost:8080`. H2 is in-memory, so its data is lost when the container stops.
+
+### 5. Deploy the Backend to Render
+The backend includes a standard [`Dockerfile`](Dockerfile) for Render's Docker web services.
+
+1. In the Render Dashboard, create a **New Web Service** and connect this Git repository.
+2. Set **Root Directory** to `hrgenius-backend`. Render will find `Dockerfile` there and build the image.
+3. Add the environment variables below in the service settings. Render sets `PORT` automatically; the app reads it.
+4. Create the service and wait for the first deploy to finish. The public API URL is shown in the Render Dashboard.
+
+| Variable | Required | Value |
+|----------|----------|-------|
+| `DB_URL` | Yes | JDBC URL for a reachable, persistent MySQL database, e.g. `jdbc:mysql://<host>:3306/hrgenius?useSSL=true&serverTimezone=UTC` |
+| `DB_USER` | Yes | Database username |
+| `DB_PASSWORD` | Yes | Database password |
+| `JWT_SECRET` | Yes | A private, random secret (at least 32 bytes); do not use the development default |
+| `CORS_ALLOWED_ORIGINS` | Yes | Exact origin(s) of the deployed frontend, comma-separated |
+| `FRONTEND_URL` | Recommended | Deployed frontend URL, used in links in the application |
+| `GOOGLE_CLIENT_ID` | If using Google login | Google OAuth client ID |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASSWORD` | If using email | SMTP server and credentials |
+
+Use a persistent external MySQL service: Render's managed database offering is PostgreSQL, which is not compatible with this backend's MySQL driver/configuration. Ensure the database allows connections from Render. Do not activate the H2 profile in production because its data is ephemeral. Redeploy after changing environment variables. Swagger UI is at `<your-render-service-url>/swagger-ui.html`.
+
+### 6. Deploy the Backend to Vercel
+Vercel's [container-image support](https://vercel.com/docs/functions/container-images) (currently Beta) runs OCI images as Vercel Functions. For this repository, create a separate Vercel project for the backend and set its **Root Directory** to `hrgenius-backend`; Vercel will detect `Dockerfile.vercel`. The frontend can remain a separate Vercel project.
+
+Configure these environment variables in the Vercel project for **Production**, **Preview**, and **Development** as appropriate:
+
+| Variable | Required | Value |
+|----------|----------|-------|
+| `PORT` | Yes | `8080` (the port exposed by the Spring Boot app) |
+| `DB_URL` | Yes | JDBC URL for a reachable, managed MySQL database, e.g. `jdbc:mysql://<host>:3306/hrgenius?useSSL=true&serverTimezone=UTC` |
+| `DB_USER` | Yes | Database username |
+| `DB_PASSWORD` | Yes | Database password |
+| `JWT_SECRET` | Yes | A private, random secret (at least 32 bytes); do not use the development default |
+| `CORS_ALLOWED_ORIGINS` | Yes | Exact origin(s) of the deployed frontend, comma-separated |
+| `FRONTEND_URL` | Recommended | Deployed frontend URL, used in links in the application |
+| `GOOGLE_CLIENT_ID` | If using Google login | Google OAuth client ID |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASSWORD` | If using email | SMTP server and credentials |
+
+Use a persistent external MySQL service; do not use the H2 profile for production because Vercel instances are ephemeral and may scale down. Ensure the database allows connections from the deployment. Set `PORT=8080` so Vercel routes traffic to the port Spring Boot listens on, then redeploy after setting variables. The API is then available at the Vercel project URL, with Swagger UI at `/swagger-ui.html`.
 
 ---
 
@@ -77,7 +139,6 @@ All seed accounts are initialized with password: **`123456`**
 |--------------------|-----|-------------|
 | **Swagger UI** | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | Interactive OpenAPI 3 exploration and testing |
 | **OpenAPI Docs** | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) | Raw OpenAPI JSON definition |
-| **H2 Web Console** | [http://localhost:8080/h2-console](http://localhost:8080/h2-console) | JDBC URL: `jdbc:h2:mem:hrgeniusdb`, User: `sa`, Password: *(empty)* |
 | **Frontend App** | [http://localhost:4200](http://localhost:4200) | Angular 18 Client Application |
 
 ---

@@ -39,8 +39,9 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        if (employeeRepository.count() > 0) {
-            log.info("Database already contains seeded data ({} employees found). Skipping seeder.", employeeRepository.count());
+        if (employeeRepository.count() > 0 || departmentRepository.count() > 0 || userRepository.count() > 0) {
+            log.info("Database already contains data ({} employees, {} departments, {} users found). Skipping seeder.",
+                    employeeRepository.count(), departmentRepository.count(), userRepository.count());
             return;
         }
 
