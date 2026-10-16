@@ -13,7 +13,7 @@ spring:
       write-dates-as-timestamps: false
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/hrgenius?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:hrgenius}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USER}
     password: ${DB_PASSWORD}
