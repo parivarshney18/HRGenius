@@ -88,7 +88,10 @@ The backend includes a standard [`Dockerfile`](Dockerfile) for Render's Docker w
 
 | Variable | Required | Value |
 |----------|----------|-------|
-| `DB_URL` | Yes | JDBC URL for a reachable, persistent MySQL database, e.g. `jdbc:mysql://<host>:3306/hrgenius?useSSL=true&serverTimezone=UTC` |
+| `DB_URL` | Recommended | Complete JDBC URL for a reachable, persistent MySQL database, e.g. `jdbc:mysql://<host>:3306/hrgenius?useSSL=true&serverTimezone=UTC` |
+| `DB_HOST` | Required when `DB_URL` is not set | Public MySQL hostname; do not use `localhost` or `127.0.0.1` on Render |
+| `DB_PORT` | Required when `DB_URL` is not set | MySQL port, normally `3306` |
+| `DB_NAME` | Required when `DB_URL` is not set | MySQL database name, normally `hrgenius` |
 | `DB_USER` | Yes | Database username |
 | `DB_PASSWORD` | Yes | Database password |
 | `JWT_SECRET` | Yes | A private, random secret (at least 32 bytes); do not use the development default |
@@ -97,7 +100,7 @@ The backend includes a standard [`Dockerfile`](Dockerfile) for Render's Docker w
 | `GOOGLE_CLIENT_ID` | If using Google login | Google OAuth client ID |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASSWORD` | If using email | SMTP server and credentials |
 
-Use a persistent external MySQL service: Render's managed database offering is PostgreSQL, which is not compatible with this backend's MySQL driver/configuration. Ensure the database allows connections from Render. Do not activate the H2 profile in production because its data is ephemeral. Redeploy after changing environment variables. Swagger UI is at `<your-render-service-url>/swagger-ui.html`.
+Use a persistent external MySQL service: Render's managed database offering is PostgreSQL, which is not compatible with this backend's MySQL driver/configuration. Ensure the database allows connections from Render. If `DB_URL` is omitted, the application builds the URL from `DB_HOST`, `DB_PORT`, and `DB_NAME`; otherwise `DB_URL` takes precedence. Do not use `localhost` or `127.0.0.1` for the database host on Render because that points back to the application container and produces `Communications link failure` / `Connection refused`. Do not activate the H2 profile in production because its data is ephemeral. Redeploy after changing environment variables. Swagger UI is at `<your-render-service-url>/swagger-ui.html`.
 
 ### 6. Deploy the Backend to Vercel
 Vercel's [container-image support](https://vercel.com/docs/functions/container-images) (currently Beta) runs OCI images as Vercel Functions. For this repository, create a separate Vercel project for the backend and set its **Root Directory** to `hrgenius-backend`; Vercel will detect `Dockerfile.vercel`. The frontend can remain a separate Vercel project.
